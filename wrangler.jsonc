@@ -1,0 +1,20 @@
+// Cloudflare settings for Stratus Radio.
+// Cloudflare reads this file every time it deploys a push from GitHub.
+// The app is plain files, so there is no build step: the files at the top
+// level of the repo are served as they are (except those in .assetsignore).
+{
+  "name": "stratusradio",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "."
+  },
+  // Cloudflare creates the DNS record and the HTTPS certificate for this
+  // address on the first deploy (ololiohill.io must be in the same Cloudflare account).
+  "routes": [
+    { "pattern": "stratusradio.ololiohill.io", "custom_domain": true }
+  ],
+  // Also serve on the free *.workers.dev address and give each non-main
+  // branch its own preview link.
+  "workers_dev": true,
+  "preview_urls": true
+}

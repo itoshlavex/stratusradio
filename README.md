@@ -12,15 +12,27 @@ Live radio from across the Pacific. Stratus Radio is a web app: it runs in any p
 - Sleep timer: 15 minutes to 2 hours, with a short fade-out.
 - Reconnects on its own when the signal drops.
 
-## Put it online with GitHub Pages (free)
+## Where it lives
 
-1. Unzip `stratusradio.zip`.
-2. Open your `stratusradio` repository on github.com and choose **uploading an existing file** (or **Add file → Upload files**).
-3. Select all 13 files, put them at the top level of the repo (not inside a folder), then tap **Commit changes**. Uploading a file with the same name as one already there replaces it.
-4. Go to **Settings → Pages**. Under **Build and deployment**, set **Source** to **Deploy from a branch**, choose **main** and **/ (root)**, then tap **Save**.
-5. After a minute or two the app is live at `https://YOUR-USERNAME.github.io/stratusradio/`.
+The app is hosted free on Cloudflare at **https://stratusradio.ololiohill.io**.
 
-On a phone, open that link and use **Add to Home Screen** (iPhone: Share → Add to Home Screen; Android: the Install button in the app or the browser menu).
+Cloudflare is linked to this GitHub repository. Every change to the `main` branch goes live on its own, usually within a minute. To update the app, change the files on `main`, either by editing them on github.com or with **Add file → Upload files** (keep files at the top level, not inside a folder; a file with the same name replaces the old one). Changes on any other branch get their own preview link instead, so you can check them first.
+
+On a phone, open the link and use **Add to Home Screen** (iPhone: Share → Add to Home Screen; Android: the Install button in the app or the browser menu).
+
+### One-time Cloudflare setup
+
+Do this once, after `wrangler.jsonc` is on the `main` branch.
+
+1. Sign in at [dash.cloudflare.com](https://dash.cloudflare.com) with the account that has the `ololiohill.io` domain.
+2. Open **Workers & Pages**, tap **Create application**, and choose the **GitHub** option (it may say **Import a repository**).
+3. When asked, sign in to GitHub and allow Cloudflare to see the `stratusradio` repository.
+4. Pick the `stratusradio` repository. Keep the project name as `stratusradio`: it must match `name` in `wrangler.jsonc` or the deploy fails. Leave the build command empty and keep the deploy command `npx wrangler deploy`, the branch `main` and the root directory `/`.
+5. Tap **Save and Deploy**.
+
+The first deploy also sets up `stratusradio.ololiohill.io`: Cloudflare adds the DNS record and the HTTPS certificate itself. The address can take a few minutes to start working. Deploy logs are under the Worker's **Deployments** tab.
+
+If the deploy says the custom domain couldn't be added, check that `ololiohill.io` is in the same Cloudflare account and that there's no existing DNS record for `stratusradio`. You can also add the domain by hand in the Worker's **Settings → Domains & Routes**.
 
 ## Adding or fixing a station
 
@@ -39,3 +51,6 @@ The stream addresses came from each station's own website or player where possib
 | `sw.js` | Lets the app open when offline |
 | `manifest.webmanifest` | Home-screen app name and colours |
 | `logo.png`, `icon-*.png`, `apple-touch-icon.png`, `favicon-32.png` | Stratus Radio logo and app icons |
+| `wrangler.jsonc` | Cloudflare hosting settings, including the `stratusradio.ololiohill.io` address |
+| `.assetsignore` | Files in the repo that Cloudflare keeps off the website |
+| `.gitignore` | Files Git leaves out of the repo |

@@ -1,0 +1,8 @@
+# Files in the repo that Cloudflare should not put on the website.
+.git
+.github
+.gitignore
+.wrangler
+node_modules
+wrangler.jsonc
+README.md
