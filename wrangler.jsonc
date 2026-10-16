@@ -16,5 +16,9 @@
   // Also serve on the free *.workers.dev address and give each non-main
   // branch its own preview link.
   "workers_dev": true,
-  "preview_urls": true
+  "preview_urls": true,
+  // Keep request logs in the Cloudflare dashboard (Worker → Observability).
+  "observability": {
+    "enabled": true
+  }
 }
