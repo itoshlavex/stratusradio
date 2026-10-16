@@ -4,8 +4,7 @@ Live radio from across the Pacific. Stratus Radio is a web app: it runs in any p
 
 ## Features
 
-- 30 built-in stations from Papua New Guinea, Fiji, Vanuatu, New Caledonia, French Polynesia, Wallis and Futuna, Guam, Pacific stations in New Zealand, plus RNZ Pacific and ABC Radio Australia.
-- More stations from every Pacific Island country (including Samoa, Tonga, Solomon Islands and Cook Islands when available) are added automatically from the free [Radio Browser](https://www.radio-browser.info/) directory.
+- Stations from Papua New Guinea and across the Pacific, plus Pacific stations in New Zealand, RNZ Pacific and ABC Radio Australia. Every stream in the list has been checked to play.
 - Choose a country, filter by Music, News & talk or Christian, or search by station, town, country or language.
 - Favourites, saved on each phone.
 - Keeps playing with the screen locked. Play, pause and change station from the lock screen or headphones.
@@ -20,9 +19,9 @@ Cloudflare is linked to this GitHub repository. Every change to the `main` branc
 
 On a phone, open the link and use **Add to Home Screen** (iPhone: Share → Add to Home Screen; Android: the Install button in the app or the browser menu).
 
-### One-time Cloudflare setup
+### Cloudflare setup (already done)
 
-Do this once, after `wrangler.jsonc` is on the `main` branch.
+Kept here in case it ever needs doing again.
 
 1. Sign in at [dash.cloudflare.com](https://dash.cloudflare.com) with the account that has the `ololiohill.io` domain.
 2. Open **Workers & Pages**, tap **Create application**, and choose the **GitHub** option (it may say **Import a repository**).
@@ -38,7 +37,7 @@ If the deploy says the custom domain couldn't be added, check that `ololiohill.i
 
 Stations are listed in `stations.js`. Copy a block, give it a new `id`, and paste the station's direct stream address in `stream`. That's the address that plays audio, not the station's web page. You can list several addresses, and the app tries them in order.
 
-The stream addresses came from each station's own website or player where possible, plus radio directories. Stations change their stream addresses from time to time, so if one stops working, check its website for a new player.
+The stream addresses came from each station's own website or player where possible. The address must start with `https://`, because the app is served over HTTPS and phones block plain `http://` streams on it. Stations change their stream addresses from time to time, so if one stops working, check its website for a new player.
 
 ## Files
 

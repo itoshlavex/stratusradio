@@ -32,7 +32,7 @@ window.STRATUS_STATIONS = [
     lang: 'Tok Pisin', desc: 'PNG music, news and talkback',
     cats: ['music', 'news'], tile: 'sky',
     stream: ['https://stream.rcs.revma.com/n5vb288kmbpwv'],
-    match: ['yumi'], homepage: 'https://www.yumifm.net/'
+    match: ['yumi'], homepage: 'https://yumifm.net/'
   },
   {
     id: 'legend-fm', country: 'PG',
@@ -40,7 +40,7 @@ window.STRATUS_STATIONS = [
     city: 'Port Moresby', lang: 'English', desc: 'Greatest hits and news',
     cats: ['music'], tile: 'royal',
     stream: ['https://stream.rcs.revma.com/4ke2h79kmbpwv'],
-    match: ['legend'], homepage: 'https://www.legendfm.net/'
+    match: ['legend'], homepage: 'https://legendfm.net/'
   },
   {
     id: 'nau-fm', country: 'PG',
@@ -66,17 +66,8 @@ window.STRATUS_STATIONS = [
     cats: ['news'], tile: 'deep',
     resolve: { type: 'azuracast', api: 'https://natradio.nbc.com.pg/api/nowplaying/nbcnationalradio' },
     // Usual AzuraCast address, used if the live lookup above fails.
-    stream: ['https://natradio.nbc.com.pg/listen/nbcnationalradio/radio.mp3'],
+    stream: ['https://natradio.nbc.com.pg/listen/nbcnationalradio/nbc.mp3'],
     match: ['nbc national', 'karai', 'national broadcasting'], homepage: 'https://www.nbc.com.pg/listen'
-  },
-  {
-    id: 'wantok-light', country: 'PG',
-    name: 'Wantok Radio Light', freq: '93.9 FM',
-    city: 'Port Moresby', also: '105.9 FM network, shortwave 7325 kHz',
-    lang: 'Tok Pisin, English', desc: 'Christian radio',
-    cats: ['christian'], tile: 'ice',
-    stream: ['https://ca7ssl.rcast.net/stream/61643//;type=mp3', 'https://ca7ssl.rcast.net/stream/61643'],
-    match: ['wantok'], homepage: 'http://www.wantokradio.org/'
   },
   {
     id: 'radio-maria-png', country: 'PG',
@@ -85,7 +76,7 @@ window.STRATUS_STATIONS = [
     lang: 'English', desc: 'Catholic radio',
     cats: ['christian'], tile: 'royal',
     stream: ['https://dreamsiteradiocp2.com/proxy/rmpapua2?mp=/stream'],
-    match: ['radio maria'], homepage: 'http://www.radiomariapng.org/'
+    match: ['radio maria'], homepage: 'https://www.radiomariapng.org/'
   },
   {
     id: 'laif-fm', country: 'PG',
@@ -155,7 +146,7 @@ window.STRATUS_STATIONS = [
     desc: 'The national broadcaster: news, talk and music',
     cats: ['news'], tile: 'navy',
     stream: ['https://radio.vbtc.vu/radiovanuatu'],
-    match: ['radio vanuatu', 'vbtc'], homepage: 'https://vbtc.vu/radio'
+    match: ['radio vanuatu', 'vbtc'], homepage: 'https://vbtc.vu/radio-2/'
   },
   {
     id: 'paradise-fm', country: 'VU',
@@ -163,7 +154,7 @@ window.STRATUS_STATIONS = [
     city: 'Port Vila', lang: 'Bislama, English', desc: 'Music and variety from VBTC',
     cats: ['music'], tile: 'sky',
     stream: ['https://radio.vbtc.vu/paradisefm'],
-    match: ['paradise'], homepage: 'https://vbtc.vu/radio'
+    match: ['paradise'], homepage: 'https://vbtc.vu/radio-2/'
   },
   {
     id: 'femme-pawa-fm', country: 'VU',
@@ -171,7 +162,7 @@ window.STRATUS_STATIONS = [
     city: 'Port Vila', lang: 'Bislama, English', desc: 'Variety from VBTC',
     cats: ['music'], tile: 'royal',
     stream: ['https://radio.vbtc.vu/femmefm'],
-    match: ['femme'], homepage: 'https://vbtc.vu/radio'
+    match: ['femme'], homepage: 'https://vbtc.vu/radio-2/'
   },
   {
     id: 'buzz-fm', country: 'VU',
@@ -189,7 +180,7 @@ window.STRATUS_STATIONS = [
     city: 'Nouméa', lang: 'French', desc: 'News and talk',
     cats: ['news'], tile: 'deep',
     stream: ['https://webradio.lagoon.nc/rrb'],
-    match: ['rythme bleu', 'rrb'], homepage: 'http://www.rrb.nc/'
+    match: ['rythme bleu', 'rrb'], homepage: 'https://www.rrb.nc/'
   },
 
   /* ---------- French Polynesia ---------- */
@@ -199,7 +190,7 @@ window.STRATUS_STATIONS = [
     city: 'Papeete', lang: 'French, Tahitian', desc: 'Public radio: news, talk and music',
     cats: ['news'], tile: 'navy',
     stream: ['https://polynesie.ice.infomaniak.ch/polynesie-128.mp3'],
-    match: ['polynesie', 'polynésie'], homepage: 'https://la1ere.francetvinfo.fr/polynesie/'
+    match: ['polynesie', 'polynésie'], homepage: 'https://la1ere.franceinfo.fr/polynesie/'
   },
   {
     id: 'radio-1-tahiti', country: 'PF',
@@ -225,7 +216,7 @@ window.STRATUS_STATIONS = [
     city: 'Mata-Utu', lang: 'French, Wallisian, Futunan', desc: 'Public radio: news and music',
     cats: ['news'], tile: 'ice',
     stream: ['https://wallisetfutuna.ice.infomaniak.ch/wallisetfutuna-128.mp3'],
-    match: ['wallis'], homepage: 'https://la1ere.francetvinfo.fr/wallisfutuna/'
+    match: ['wallis'], homepage: 'https://la1ere.franceinfo.fr/wallisfutuna/'
   },
 
   /* ---------- Guam ---------- */
@@ -246,10 +237,10 @@ window.STRATUS_STATIONS = [
     lang: 'English, Samoan, Tongan and more', desc: 'Pacific talk, news and music',
     cats: ['news', 'music'], tile: 'deep',
     stream: [
-      'https://18243.live.streamtheworld.com/531PI_SC',
+      'https://playerservices.streamtheworld.com/api/livestream-redirect/531PI_SC',
       'https://playerservices.streamtheworld.com/api/livestream-redirect/531PIAAC_SC'
     ],
-    match: ['531'], homepage: 'https://pmn.co.nz/stations/531-pi'
+    match: ['531'], homepage: 'https://pmn.co.nz/radio-stations/531-pi'
   },
   {
     id: 'niu-fm', country: 'NZ',
@@ -257,8 +248,8 @@ window.STRATUS_STATIONS = [
     city: 'Auckland', lang: 'English', desc: 'Pacific hip-hop and R&B',
     cats: ['music'], tile: 'sky',
     stream: [
-      'https://14613.live.streamtheworld.com/NIUFM_SC',
-      'https://playerservices.streamtheworld.com/api/livestream-redirect/NIUFM.mp3'
+      'https://playerservices.streamtheworld.com/api/livestream-redirect/NIUFM_SC',
+      'https://playerservices.streamtheworld.com/api/livestream-redirect/NIUFMAAC_SC'
     ],
     match: ['niu fm', 'niufm'], homepage: 'https://pmn.co.nz/radio-stations/niu-fm'
   },
@@ -269,10 +260,7 @@ window.STRATUS_STATIONS = [
     name: 'RNZ Pacific', freq: '', short: 'RNZ',
     city: 'Wellington, NZ', lang: 'English', desc: 'Pacific news from Radio New Zealand',
     cats: ['news'], tile: 'navy',
-    stream: [
-      'https://radionz-ice.streamguys.com/international.mp3',
-      'http://radionz-ice.streamguys.com/international.mp3'
-    ],
+    stream: ['https://radionz.streamguys1.com/pacific/pacific/playlist.m3u8'],
     match: ['rnz', 'radio new zealand'], homepage: 'https://www.rnz.co.nz/international'
   },
   {
@@ -282,8 +270,8 @@ window.STRATUS_STATIONS = [
     lang: 'English', desc: 'Pacific news and programmes from Australia',
     cats: ['news'], tile: 'bright',
     stream: [
-      'https://live-radio01.mediahubaustralia.com/RAEW/mp3/',
-      'http://live-radio01.mediahubaustralia.com/RAEW/mp3/'
+      'https://streaming.abc-cdn.net.au/audio/hls/ramulti.m3u8?source=web',
+      'https://live-radio01.mediahubaustralia.com/RAMW/aac/?source=web'
     ],
     match: ['radio australia'], homepage: 'https://www.abc.net.au/pacific'
   }

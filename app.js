@@ -33,16 +33,7 @@
   ];
   var COUNTRY = {};
   COUNTRIES.forEach(function (c, i) { COUNTRY[c[0]] = { code: c[0], label: c[1], place: c[2], order: i }; });
-  // Countries looked up in the Radio Browser directory (not NZ: its hundreds of stations would bury the Pacific ones).
-  var DIR_COUNTRIES = COUNTRIES.map(function (c) { return c[0]; }).filter(function (c) { return c !== 'NZ' && c !== 'XP'; });
-  var RB_HOSTS = [
-    'https://de1.api.radio-browser.info',
-    'https://de2.api.radio-browser.info',
-    'https://fi1.api.radio-browser.info',
-    'https://all.api.radio-browser.info'
-  ];
   var HLS_JS = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js';
-  var TILES = ['navy', 'royal', 'bright', 'sky', 'ice', 'deep'];
   var MAX_RETRIES = 8;          // reconnect attempts after a stream drops (about 2.5 minutes)
   var CONNECT_TIMEOUT = 15000;  // give a stream this long to start
   var STALL_TIMEOUT = 20000;    // buffering longer than this triggers a reconnect
@@ -54,30 +45,25 @@
     player: $('#player'), pTile: $('#p-tile'), pName: $('#p-name'), pStatus: $('#p-status'), pHelp: $('#p-help'),
     playBtn: $('#play-btn'), sleepBtn: $('#sleep-btn'), sleepLeft: $('#sleep-left'),
     sheet: $('#sleep-sheet'), sleepGrid: $('#sleep-grid'), sleepSub: $('#sleep-sub'), sleepOff: $('#sleep-off'),
-    countries: $('#countries'), dirStatus: $('#dir-status'),
-    install: $('#install'), installBtn: $('#install-btn'), installIos: $('#install-ios')
+    countries: $('#countries')
   };
   var audio = $('#audio');
 
   /* ---------- Stations ---------- */
 
-  var builtIn = (window.STRATUS_STATIONS || []).map(function (s) {
-    var st = Object.assign({ source: 'built-in', cats: [], tile: 'navy' }, s);
-    st.baseStream = (s.stream || []).slice();
-    st.stream = st.baseStream.slice();
-    return st;
+  var stations = (window.STRATUS_STATIONS || []).map(function (s) {
+    return Object.assign({ cats: [], tile: 'navy', stream: [] }, s);
   });
-  var directory = [];
-  var rbHost = '';
 
-  function allStations() { return builtIn.concat(directory); }
+  function allStations() { return stations; }
   function byId(id) {
-    var list = allStations();
-    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+    for (var i = 0; i < stations.length; i++) if (stations[i].id === id) return stations[i];
     return null;
   }
 
-  var favs = new Set(store.get('favs', []));
+  // Older versions also listed stations from an online directory; forget those.
+  try { localStorage.removeItem(KEY + 'dir'); localStorage.removeItem(KEY + 'dir2'); } catch (e) {}
+  var favs = new Set(store.get('favs', []).filter(byId));
   var filter = store.get('filter', 'all');
   if (!CATS.some(function (c) { return c.id === filter; })) filter = 'all';
   var country = store.get('country', 'all');
@@ -91,7 +77,6 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
-  function norm(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
   function initials(name) {
     var words = String(name || '').replace(/[^A-Za-z0-9 ]/g, ' ').split(/\s+/).filter(Boolean);
     var skip = { radio: 1, the: 1, fm: 1, png: 1 };
@@ -99,14 +84,6 @@
     var src = keep.length ? keep : words;
     if (src.length === 1) return src[0].slice(0, 3).toUpperCase();
     return src.slice(0, 3).map(function (w) { return w[0]; }).join('').toUpperCase();
-  }
-  function titleCase(s) {
-    return String(s || '').trim().replace(/\b([a-z])/g, function (m) { return m.toUpperCase(); });
-  }
-  function hashPick(s, arr) {
-    var h = 0; s = String(s);
-    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
-    return arr[Math.abs(h) % arr.length];
   }
   function uniq(list) {
     var seen = {};
@@ -122,10 +99,6 @@
     });
     return uniq(out);
   }
-  function sameUrl(a, b) {
-    return String(a || '').replace(/^https?:\/\//i, '').replace(/\/+$/, '') ===
-      String(b || '').replace(/^https?:\/\//i, '').replace(/\/+$/, '');
-  }
   function parseFreq(freq) {
     var m = /^\s*([\d.]+)\s*(FM|AM|MHz|kHz)?/i.exec(freq || '');
     return m ? { num: m[1], band: (m[2] || 'FM').toUpperCase() } : null;
@@ -136,11 +109,6 @@
     return fetch(url, { signal: ctrl ? ctrl.signal : undefined, cache: 'no-store' })
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .finally(function () { clearTimeout(t); });
-  }
-  function shuffled(arr) {
-    var a = arr.slice();
-    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
-    return a;
   }
 
   /* ---------- Rendering ---------- */
@@ -156,12 +124,11 @@
     var fav = favs.has(st.id);
     var places = placeOf(st) + (st.also ? ' \u00b7 also ' + st.also : '');
     var meta = [st.lang, places].filter(Boolean).join(' · ');
-    var badge = st.source === 'directory' ? '<span class="badge">Directory</span>' : '';
     return '<li class="st" data-id="' + esc(st.id) + '">' +
       '<button class="st-main" type="button" aria-label="Play ' + esc(st.name) + '">' +
         '<span class="tile t-' + esc(st.tile) + '" aria-hidden="true">' + tileHTML(st) + '</span>' +
         '<span class="st-text">' +
-          '<span class="st-name">' + esc(st.name) + badge + '</span>' +
+          '<span class="st-name">' + esc(st.name) + '</span>' +
           (meta ? '<span class="st-meta">' + esc(meta) + '</span>' : '') +
           (st.desc ? '<span class="st-desc">' + esc(st.desc) + '</span>' : '') +
         '</span>' +
@@ -201,6 +168,7 @@
         esc(COUNTRY[k].label) + '<span class="n">' + counts[k] + '</span></button>';
     }).join('');
     el.countries.innerHTML = html;
+    syncScrollHints(el.countries);
   }
 
   function renderChips() {
@@ -208,6 +176,7 @@
       var n = c.id === 'fav' && favs.size ? '<span class="n">' + favs.size + '</span>' : '';
       return '<button class="chip" type="button" data-cat="' + c.id + '" aria-pressed="' + (filter === c.id) + '">' + esc(c.label) + n + '</button>';
     }).join('');
+    syncScrollHints(el.chips);
   }
 
   function renderList() {
@@ -367,7 +336,8 @@
     clearTimers(true);
     if (!navigator.onLine) { teardown(); setState('offline'); return; }
     var token = ++playToken;
-    if (state !== 'reconnecting') setState('connecting');
+    // A fresh tap (not an automatic reconnect) gets the full set of retries again.
+    if (state !== 'reconnecting') { retries = 0; passes = 0; setState('connecting'); }
     if (urls.length) { urlIndex = goodIndex >= 0 ? goodIndex : 0; startUrl(token); return; }
     if (current.resolve) unlockAudio();
     var st = current;
@@ -488,7 +458,6 @@
     retries = 0;
     setState('live');
     startNowPlaying();
-    countListen(current);
   });
   audio.addEventListener('waiting', function () {
     if (!streamOn || !wantPlaying || fromSilent()) return;
@@ -752,161 +721,6 @@
     }
   }
 
-  /* ---------- Radio Browser directory ---------- */
-
-  function slim(s) {
-    if (!s || s.lastcheckok !== 1) return null;
-    var url = s.url_resolved || s.url;
-    if (!url) return null;
-    return {
-      uuid: s.stationuuid, name: String(s.name || '').trim(), url: url, url2: s.url,
-      cc: String(s.countrycode || '').toUpperCase(),
-      tags: s.tags || '', state: s.state || '', lang: s.language || '', homepage: s.homepage || '',
-      bitrate: s.bitrate || 0
-    };
-  }
-
-  // Some directory entries are tagged with every country; drop names that show up in 3 or more.
-  var SPAM = /abdul\s*basit|abdulsamad|quran|coran|holy\s*kuran/i;
-  function cleanDirectory(list) {
-    var where = {};
-    list.forEach(function (d) {
-      if (!d) return;
-      var n = norm(d.name);
-      (where[n] = where[n] || {})[d.cc] = 1;
-    });
-    return list.filter(function (d) {
-      return d && d.name && COUNTRY[d.cc] && !SPAM.test(d.name) && Object.keys(where[norm(d.name)]).length < 3;
-    });
-  }
-
-  function toStation(d) {
-    var text = (d.tags + ' ' + d.name).toLowerCase();
-    var cats = [];
-    if (/christ|gospel|relig|catholic|church|worship|bible|adventist|faith|praise|lotu/.test(text)) cats.push('christian');
-    if (/news|talk|information|current affairs/.test(text)) cats.push('news');
-    if (/music|pop|hits|rock|reggae|hip ?hop|dance|r&b|country|island|contemporary|oldies/.test(text)) cats.push('music');
-    var fm = /(\d{2,3}\.\d)\s*(fm)?/i.exec(d.name);
-    var tagList = d.tags.split(',').map(function (t) { return t.trim(); }).filter(Boolean).slice(0, 3);
-    var desc = tagList.length ? titleCase(tagList.join(', ')) : 'Online stream';
-    if (d.bitrate) desc += ' · ' + d.bitrate + ' kbps';
-    var c = COUNTRY[d.cc];
-    return {
-      id: 'rb-' + d.uuid, name: d.name, country: d.cc, freq: fm ? fm[1] + ' FM' : '', short: initials(d.name),
-      city: titleCase(d.state) || (c ? c.place : ''), lang: titleCase(d.lang), desc: desc, cats: cats,
-      tile: hashPick(d.name, TILES), stream: uniq([d.url, d.url2]), homepage: d.homepage,
-      tags: d.tags, uuid: d.uuid, source: 'directory'
-    };
-  }
-
-  function mergeDirectory(list) {
-    builtIn.forEach(function (b) { b.stream = b.baseStream.slice(); });
-    var out = [], seen = {};
-    cleanDirectory(list).forEach(function (d) {
-      var n = norm(d.name);
-      var key = d.cc + ':' + n;
-      if (!n || seen[key]) return;
-      var twin = null;
-      for (var i = 0; i < builtIn.length && !twin; i++) {
-        var b = builtIn[i];
-        var urlHit = b.stream.some(function (u) { return sameUrl(u, d.url); });
-        var nameHit = b.country === d.cc && (b.match || []).some(function (m) { return n.indexOf(norm(m)) >= 0; });
-        if (nameHit || urlHit) twin = b;
-      }
-      if (twin) {
-        // Same station as a built-in one: keep its directory address as a backup.
-        if (!twin.stream.some(function (u) { return sameUrl(u, d.url); })) twin.stream.push(d.url);
-        return;
-      }
-      seen[key] = 1;
-      out.push(toStation(d));
-    });
-    out.sort(function (a, b) { return COUNTRY[a.country].order - COUNTRY[b.country].order; });
-    directory = out;
-    if (!current) restoreLast();
-    var link = '<a href="https://www.radio-browser.info/" target="_blank" rel="noopener">Radio Browser</a>';
-    el.dirStatus.innerHTML = out.length
-      ? 'Also showing ' + out.length + ' more Pacific station' + (out.length === 1 ? '' : 's') + ' from the ' + link + ' community directory, marked “Directory”. Some may be off air.'
-      : 'The Pacific stations in the ' + link + ' community directory are already in this list.';
-    renderCountries();
-    renderList();
-  }
-
-  function fetchCountry(host, cc) {
-    return fetchJSON(host + '/json/stations/search?countrycode=' + cc + '&hidebroken=true&order=clickcount&reverse=true&limit=100', 9000)
-      .then(function (data) {
-        if (!Array.isArray(data)) throw new Error('bad');
-        return data.map(slim).filter(Boolean).map(function (d) { d.cc = d.cc || cc; return d; });
-      });
-  }
-
-  function loadDirectory() {
-    var cached = store.get('dir2', null);
-    if (cached && Array.isArray(cached.list)) { rbHost = cached.host || ''; mergeDirectory(cached.list); }
-    if (cached && Date.now() - cached.t < 6 * 3600 * 1000) return;
-    if (!navigator.onLine) {
-      if (!cached) el.dirStatus.textContent = 'You’re offline, so only the built-in stations are showing.';
-      return;
-    }
-    var hosts = shuffled(RB_HOSTS.slice(0, 3)).concat(RB_HOSTS.slice(3));
-    // Find a directory server that answers, using PNG as the first lookup.
-    (function tryHost(i) {
-      if (i >= hosts.length) {
-        if (!cached) el.dirStatus.textContent = 'Couldn’t reach the Radio Browser directory, so only the built-in stations are showing.';
-        return;
-      }
-      var host = hosts[i];
-      fetchCountry(host, DIR_COUNTRIES[0]).then(function (first) {
-        rbHost = host;
-        var all = first.slice();
-        var rest = DIR_COUNTRIES.slice(1);
-        var next = 0;
-        // Look up the other countries, four at a time.
-        function worker() {
-          if (next >= rest.length) return Promise.resolve();
-          var cc = rest[next++];
-          return fetchCountry(host, cc).then(function (l) { all = all.concat(l); }, function () {}).then(worker);
-        }
-        return Promise.all([worker(), worker(), worker(), worker()]).then(function () {
-          store.set('dir2', { t: Date.now(), host: host, list: all });
-          mergeDirectory(all);
-        });
-      }).catch(function () { tryHost(i + 1); });
-    })(0);
-  }
-
-  try { localStorage.removeItem('stratus:dir'); } catch (e) {}
-  var counted = {};
-  function countListen(st) {
-    // Radio Browser asks apps to report a listen so popular stations rise in the directory.
-    if (!st || st.source !== 'directory' || counted[st.id] || !rbHost) return;
-    counted[st.id] = 1;
-    try { fetch(rbHost + '/json/url/' + encodeURIComponent(st.uuid), { mode: 'cors' }).catch(function () {}); } catch (e) {}
-  }
-
-  /* ---------- Install ---------- */
-
-  var deferredPrompt = null;
-  window.addEventListener('beforeinstallprompt', function (e) {
-    e.preventDefault();
-    deferredPrompt = e;
-    el.install.hidden = false;
-  });
-  window.addEventListener('appinstalled', function () { el.install.hidden = true; deferredPrompt = null; });
-  el.installBtn.addEventListener('click', function () {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    Promise.resolve(deferredPrompt.userChoice).catch(function () {}).then(function () {
-      deferredPrompt = null; el.install.hidden = true;
-    });
-  });
-  (function () {
-    var ua = navigator.userAgent || '';
-    var ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    var standalone = navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
-    if (ios && !standalone) el.installIos.hidden = false;
-  })();
-
   /* ---------- Events ---------- */
 
   el.list.addEventListener('click', function (e) {
@@ -965,6 +779,60 @@
     if (!document.hidden) checkSleep();
   });
 
+  /* ---------- Light / dark ---------- */
+
+  var THEMES = ['auto', 'light', 'dark'];
+  var THEME_NAME = { auto: 'Same as phone', light: 'Light mode', dark: 'Dark mode' };
+  var theme = store.get('theme', 'auto');
+  if (THEMES.indexOf(theme) < 0) theme = 'auto';
+  var themeBtn = $('#theme-btn'), tagline = $('#tagline'), themeMeta = document.querySelector('meta[name="theme-color"]');
+  var taglineText = tagline.textContent, taglineTimer = 0;
+
+  function applyTheme() {
+    var root = document.documentElement;
+    if (theme === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', theme);
+    themeBtn.setAttribute('data-mode', theme);
+    themeBtn.setAttribute('aria-label', 'Theme: ' + THEME_NAME[theme].toLowerCase() + '. Tap to change.');
+    themeBtn.title = 'Theme: ' + THEME_NAME[theme];
+    // Match the phone's status bar to the header colour.
+    var bg = getComputedStyle(root).getPropertyValue('--header-bg').trim();
+    if (themeMeta && bg) themeMeta.setAttribute('content', bg);
+  }
+  themeBtn.addEventListener('click', function () {
+    theme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
+    store.set('theme', theme);
+    applyTheme();
+    // Say which mode is on for a moment, in place of the tagline.
+    tagline.textContent = 'Theme: ' + THEME_NAME[theme];
+    clearTimeout(taglineTimer);
+    taglineTimer = setTimeout(function () { tagline.textContent = taglineText; }, 1800);
+  });
+  if (window.matchMedia) {
+    var darkQuery = matchMedia('(prefers-color-scheme: dark)');
+    var onScheme = function () { if (theme === 'auto') applyTheme(); };
+    if (darkQuery.addEventListener) darkQuery.addEventListener('change', onScheme); else if (darkQuery.addListener) darkQuery.addListener(onScheme);
+  }
+
+  // Fade the edge of a chip row while more chips are hidden off that side.
+  function syncScrollHints(row) {
+    var max = row.scrollWidth - row.clientWidth;
+    row.classList.toggle('more-left', max > 1 && row.scrollLeft > 1);
+    row.classList.toggle('more-right', max > 1 && row.scrollLeft < max - 1);
+  }
+  [el.countries, el.chips].forEach(function (row) {
+    row.addEventListener('scroll', function () { syncScrollHints(row); }, { passive: true });
+  });
+  function syncAllHints() { syncScrollHints(el.countries); syncScrollHints(el.chips); }
+  window.addEventListener('resize', syncAllHints);
+
+  // Keep the end of the list clear of the floating player, which grows when it shows help text.
+  function syncPlayerSpace() {
+    var space = Math.round(window.innerHeight - el.player.getBoundingClientRect().top);
+    if (space > 0) document.documentElement.style.setProperty('--player-space', space + 'px');
+  }
+  if (typeof ResizeObserver !== 'undefined') new ResizeObserver(syncPlayerSpace).observe(el.player);
+  window.addEventListener('resize', syncPlayerSpace);
+
   /* ---------- Start ---------- */
 
   function restoreLast() {
@@ -982,7 +850,10 @@
   })();
   renderPlayer();
   renderSleep();
-  loadDirectory();
+  applyTheme();
+  syncPlayerSpace();
+  syncAllHints();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncAllHints);
 
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
     window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });

@@ -1,6 +1,6 @@
 /* Stratus Radio service worker: keeps the app itself available offline.
-   Radio streams and the station directory always go straight to the network. */
-var CACHE = 'stratus-v3';
+   Radio streams and live station lookups always go straight to the network. */
+var CACHE = 'stratus-v4';
 var SHELL = [
   './',
   'index.html',
@@ -47,7 +47,7 @@ self.addEventListener('fetch', function (e) {
     return;
   }
 
-  // Everything else from other sites (streams, directory, NBC lookup): leave alone.
+  // Everything else from other sites (streams, NBC song lookup, hls.js): leave alone.
   if (url.origin !== self.location.origin) return;
   // Range requests are media; don't touch them.
   if (req.headers.has('range')) return;
