@@ -7,6 +7,8 @@ Live radio from across the Pacific. Stratus Radio is a web app: it runs in any p
 - Stations from Papua New Guinea and across the Pacific, plus Pacific stations in New Zealand, RNZ Pacific and ABC Radio Australia. Every stream in the list has been checked to play.
 - Choose a country, filter by Music, News & talk or Christian, or search by station, town, country or language.
 - Favourites, saved on each phone.
+- Share a station: the share button in the player sends a link that opens Stratus Radio with that station ready to play.
+- Light and dark mode: follows the phone, or tap the button in the header to switch.
 - Keeps playing with the screen locked. Play, pause and change station from the lock screen or headphones.
 - Sleep timer: 15 minutes to 2 hours, with a short fade-out.
 - Reconnects on its own when the signal drops.

@@ -43,7 +43,7 @@
     list: $('#list'), chips: $('#chips'), q: $('#q'), count: $('#count'),
     empty: $('#empty'), emptyTitle: $('#empty-title'), emptyBody: $('#empty-body'),
     player: $('#player'), pTile: $('#p-tile'), pName: $('#p-name'), pStatus: $('#p-status'), pHelp: $('#p-help'),
-    playBtn: $('#play-btn'), sleepBtn: $('#sleep-btn'), sleepLeft: $('#sleep-left'),
+    playBtn: $('#play-btn'), shareBtn: $('#share-btn'), sleepBtn: $('#sleep-btn'), sleepLeft: $('#sleep-left'), toast: $('#toast'),
     sheet: $('#sleep-sheet'), sleepGrid: $('#sleep-grid'), sleepSub: $('#sleep-sub'), sleepOff: $('#sleep-off'),
     countries: $('#countries')
   };
@@ -243,6 +243,7 @@
   function renderPlayer() {
     el.player.setAttribute('data-state', state);
     el.playBtn.disabled = !current;
+    el.shareBtn.disabled = !current;
     el.pHelp.hidden = true;
     if (!current) {
       el.pTile.className = 'tile tile-sm';
@@ -833,6 +834,71 @@
   if (typeof ResizeObserver !== 'undefined') new ResizeObserver(syncPlayerSpace).observe(el.player);
   window.addEventListener('resize', syncPlayerSpace);
 
+  /* ---------- Share ---------- */
+
+  // A shared link opens the app with that station picked: ?station=<id>
+  function stationLink(st) {
+    return location.origin + location.pathname + '?station=' + encodeURIComponent(st.id);
+  }
+
+  var toastTimer = 0;
+  function showToast(msg) {
+    el.toast.textContent = msg;
+    el.toast.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.toast.hidden = true; }, 2200);
+  }
+
+  function copyText(text) {
+    function legacy() {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) { return false; }
+    }
+    function done(ok) { if (ok) showToast('Link copied'); else window.prompt('Copy this link', text); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(legacy()); });
+    } else {
+      done(legacy());
+    }
+  }
+
+  function shareStation() {
+    if (!current) return;
+    var st = current, url = stationLink(st);
+    var where = [st.freq, placeOf(st)].filter(Boolean).join(', ');
+    var data = { title: st.name + ' on Stratus Radio', text: 'Listen to ' + st.name + (where ? ' (' + where + ')' : '') + ' live on Stratus Radio', url: url };
+    if (navigator.share) {
+      navigator.share(data).catch(function (err) {
+        // Closing the share sheet isn't an error; anything else falls back to copying.
+        if (!err || err.name !== 'AbortError') copyText(url);
+      });
+    } else {
+      copyText(url);
+    }
+  }
+  el.shareBtn.addEventListener('click', shareStation);
+
+  // Opened from a shared link: pick that station and show it, ready to play.
+  function openSharedStation() {
+    var id = null;
+    try { id = new URLSearchParams(location.search).get('station'); } catch (e) {}
+    if (!id) return null;
+    try { history.replaceState(null, '', location.pathname); } catch (e) {}
+    var st = byId(id);
+    if (!st) return null;
+    current = st; state = 'idle';
+    store.set('last', st.id);
+    country = 'all'; filter = 'all'; query = ''; el.q.value = '';
+    return st;
+  }
+
   /* ---------- Start ---------- */
 
   function restoreLast() {
@@ -840,10 +906,17 @@
     if (last) { current = last; state = 'idle'; renderPlayer(); syncRows(); updateMediaMeta(); }
   }
 
+  var shared = openSharedStation();
   renderCountries();
   renderChips();
   renderList();
-  restoreLast();
+  if (shared) {
+    renderPlayer(); syncRows(); updateMediaMeta();
+    var row = el.list.querySelector('.st[data-id="' + shared.id + '"]');
+    if (row && row.scrollIntoView) row.scrollIntoView({ block: 'center' });
+  } else {
+    restoreLast();
+  }
   (function () {
     var on = el.countries.querySelector('[aria-pressed="true"]');
     if (on && on.getAttribute('data-country') !== 'all') el.countries.scrollLeft = Math.max(0, on.offsetLeft - 24);
