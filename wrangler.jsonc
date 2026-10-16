@@ -6,7 +6,10 @@
   "name": "stratusradio",
   "compatibility_date": "2026-10-01",
   "assets": {
-    "directory": "."
+    "directory": ".",
+    // Addresses that aren't a file (like /yumi-fm, a shared station link)
+    // open the app, which then picks that station.
+    "not_found_handling": "single-page-application"
   },
   // Cloudflare creates the DNS record and the HTTPS certificate for this
   // address on the first deploy (ololiohill.io must be in the same Cloudflare account).

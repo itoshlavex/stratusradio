@@ -838,9 +838,9 @@
 
   /* ---------- Share ---------- */
 
-  // A shared link opens the app with that station picked: ?station=<id>
+  // A shared link opens the app with that station picked: /<station id>
   function stationLink(st) {
-    return location.origin + location.pathname + '?station=' + encodeURIComponent(st.id);
+    return location.origin + '/' + encodeURIComponent(st.id);
   }
 
   var toastTimer = 0;
@@ -874,8 +874,8 @@
   function shareStation(st) {
     if (!st) return;
     var url = stationLink(st);
-    var where = [st.freq, placeOf(st)].filter(Boolean).join(', ');
-    var data = { title: st.name + ' on Stratus Radio', text: 'Listen to ' + st.name + (where ? ' (' + where + ')' : '') + ' live on Stratus Radio', url: url };
+    // Just the link: chat apps show their own preview card for it.
+    var data = { title: st.name + ' on Stratus Radio', url: url };
     if (navigator.share) {
       navigator.share(data).catch(function (err) {
         // Closing the share sheet isn't an error; anything else falls back to copying.
@@ -888,10 +888,16 @@
 
   // Opened from a shared link: pick that station and show it, ready to play.
   function openSharedStation() {
+    // /yumi-fm, or ?station=yumi-fm from links shared before the short form.
     var id = null;
     try { id = new URLSearchParams(location.search).get('station'); } catch (e) {}
+    if (!id) {
+      var path = location.pathname.replace(/^\/+|\/+$/g, '');
+      try { path = decodeURIComponent(path); } catch (e) {}
+      if (path && path !== 'index.html') id = path;
+    }
     if (!id) return null;
-    try { history.replaceState(null, '', location.pathname); } catch (e) {}
+    try { history.replaceState(null, '', '/'); } catch (e) {}
     var st = byId(id);
     if (!st) return null;
     current = st; state = 'idle';
