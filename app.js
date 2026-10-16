@@ -306,14 +306,16 @@
     syncMarquee();
   }
 
-  // A song title too long for the player scrolls like a ticker: after 3 s it moves left
-  // at 30 px a second without stopping, with the start following the end after a gap.
+  // A song title too long for the player scrolls like a ticker, the start following the
+  // end after a gap: after 3 s it makes one full lap at 30 px a second, then rests 30 s,
+  // and keeps doing that (lap, rest) until the title changes.
   // Phones set to reduce motion keep it still, ending in "…".
-  var marquee = null;
+  var marquee = null, marqueeTimer = 0;
   var MARQUEE_GAP = 40;
   var reduceMotion = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : null;
   function syncMarquee() {
     if (marquee) { marquee.cancel(); marquee = null; }
+    clearTimeout(marqueeTimer);
     var box = el.pStatus.querySelector('.p-scroll'), track = box && box.firstChild;
     if (!box || !track) return;
     var first = track.firstChild;
@@ -328,10 +330,16 @@
     copy.style.marginLeft = MARQUEE_GAP + 'px';
     track.appendChild(copy);
     var lap = textWidth + MARQUEE_GAP;
-    marquee = track.animate(
-      [{ transform: 'translateX(0)' }, { transform: 'translateX(' + (-lap) + 'px)' }],
-      { duration: lap / 30 * 1000, delay: 3000, iterations: Infinity, easing: 'linear' }
-    );
+    function run(delay, then) {
+      marquee = track.animate(
+        [{ transform: 'translateX(0)' }, { transform: 'translateX(' + (-lap) + 'px)' }],
+        { duration: lap / 30 * 1000, delay: delay, easing: 'linear' }
+      );
+      // A lap ends with the copy exactly where the start was, so stopping shows the start.
+      if (then) marquee.onfinish = then;
+    }
+    function rest() { marqueeTimer = setTimeout(function () { run(0, rest); }, 30000); }
+    run(3000, rest);
   }
   window.addEventListener('resize', syncMarquee);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncMarquee);
