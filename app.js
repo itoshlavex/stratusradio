@@ -113,21 +113,41 @@
 
   /* ---------- Rendering ---------- */
 
+  // Station logos live in logos/<id>.webp (set logo: false in stations.js to skip one).
+  // If a logo fails to load, the tile falls back to its frequency or letters.
+  var noLogo = new Set();
+  function logoOf(st) {
+    if (st.logo === false || noLogo.has(st.id)) return '';
+    return st.logo || 'logos/' + st.id + '.webp';
+  }
+  function tileClass(st, extra) {
+    return 'tile ' + (extra ? extra + ' ' : '') + 't-' + st.tile + (logoOf(st) ? ' has-logo' : '');
+  }
   function tileHTML(st) {
     var f = parseFreq(st.freq);
-    if (f) return '<span class="tile-freq' + (f.num.length > 4 ? ' is-long' : '') + '">' + esc(f.num) + '</span><span class="tile-band">' + esc(f.band) + '</span>';
-    return '<span class="tile-short">' + esc(st.short || initials(st.name)) + '</span>';
+    var text = f
+      ? '<span class="tile-freq' + (f.num.length > 4 ? ' is-long' : '') + '">' + esc(f.num) + '</span><span class="tile-band">' + esc(f.band) + '</span>'
+      : '<span class="tile-short">' + esc(st.short || initials(st.name)) + '</span>';
+    var logo = logoOf(st);
+    return text + (logo ? '<img class="tile-logo" src="' + esc(logo) + '" alt="" loading="lazy" decoding="async" data-id="' + esc(st.id) + '">' : '');
   }
+  document.addEventListener('error', function (e) {
+    var img = e.target;
+    if (!img || !img.classList || !img.classList.contains('tile-logo')) return;
+    noLogo.add(img.getAttribute('data-id'));
+    if (img.parentNode) img.parentNode.classList.remove('has-logo');
+    img.remove();
+  }, true);
   var SHARE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5 10 14M20.5 3.5 14 20.5l-4-6.5-6.5-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>';
   var STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
 
   function rowHTML(st) {
     var fav = favs.has(st.id);
     var places = placeOf(st) + (st.also ? ' \u00b7 also ' + st.also : '');
-    var meta = [st.lang, places].filter(Boolean).join(' · ');
+    var meta = [st.freq, st.lang, places].filter(Boolean).join(' · ');
     return '<li class="st" data-id="' + esc(st.id) + '">' +
       '<button class="st-main" type="button" aria-label="Play ' + esc(st.name) + '">' +
-        '<span class="tile t-' + esc(st.tile) + '" aria-hidden="true">' + tileHTML(st) + '</span>' +
+        '<span class="' + esc(tileClass(st)) + '" aria-hidden="true">' + tileHTML(st) + '</span>' +
         '<span class="st-text">' +
           '<span class="st-name">' + esc(st.name) + '</span>' +
           (meta ? '<span class="st-meta">' + esc(meta) + '</span>' : '') +
@@ -254,7 +274,7 @@
       el.playBtn.setAttribute('aria-label', 'Play');
       return;
     }
-    el.pTile.className = 'tile tile-sm t-' + current.tile;
+    el.pTile.className = tileClass(current, 'tile-sm');
     el.pTile.innerHTML = tileHTML(current);
     el.pName.textContent = current.name;
     el.playBtn.setAttribute('aria-label', isActive() ? 'Pause ' + current.name : 'Play ' + current.name);
@@ -593,10 +613,13 @@
         title: nowPlaying || current.name,
         artist: nowPlaying ? current.name : (where || 'Live radio'),
         album: 'Stratus Radio',
-        artwork: [
-          { src: artwork(current), sizes: '512x512', type: 'image/png' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png' }
-        ]
+        // The station's logo when it has one; otherwise a drawn tile with its frequency.
+        artwork: logoOf(current)
+          ? [{ src: new URL(logoOf(current), location.href).href, sizes: '256x256', type: 'image/webp' }]
+          : [
+            { src: artwork(current), sizes: '512x512', type: 'image/png' },
+            { src: 'icon-512.png', sizes: '512x512', type: 'image/png' }
+          ]
       });
     } catch (e) {}
   }

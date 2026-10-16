@@ -37,7 +37,7 @@ If the deploy says the custom domain couldn't be added, check that `ololiohill.i
 
 ## Adding or fixing a station
 
-Stations are listed in `stations.js`. Copy a block, give it a new `id`, and paste the station's direct stream address in `stream`. That's the address that plays audio, not the station's web page. You can list several addresses, and the app tries them in order.
+Stations are listed in `stations.js`. Copy a block, give it a new `id`, and paste the station's direct stream address in `stream`. For its logo, add a square image named after the `id` to the `logos` folder, for example `logos/yumi-fm.webp` (256 × 256 pixels in WebP format works well). Without a logo, the tile shows the station's frequency instead. That's the address that plays audio, not the station's web page. You can list several addresses, and the app tries them in order.
 
 The stream addresses came from each station's own website or player where possible. The address must start with `https://`, because the app is served over HTTPS and phones block plain `http://` streams on it. Stations change their stream addresses from time to time, so if one stops working, check its website for a new player.
 
@@ -52,6 +52,7 @@ The stream addresses came from each station's own website or player where possib
 | `sw.js` | Lets the app open when offline |
 | `manifest.webmanifest` | Home-screen app name and colours |
 | `logo.png`, `icon-*.png`, `apple-touch-icon.png`, `favicon-32.png` | Stratus Radio logo and app icons |
+| `logos/` | Station logos, one square image per station, named after the station's `id` |
 | `wrangler.jsonc` | Cloudflare hosting settings, including the `stratusradio.ololiohill.io` address |
 | `.assetsignore` | Files in the repo that Cloudflare keeps off the website |
 | `.gitignore` | Files Git leaves out of the repo |

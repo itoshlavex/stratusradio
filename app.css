@@ -279,6 +279,14 @@ button { font: inherit; color: inherit; }
   color: var(--tile-fg, var(--tile-navy-fg));
   font-family: var(--display);
   line-height: 0.95;
+  position: relative; overflow: hidden;
+}
+/* Station logo covers the tile; the frequency/letters underneath show if it fails to load */
+.tile-logo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.tile.has-logo > span { visibility: hidden; }
+.tile.has-logo::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(2, 26, 79, 0.08);
 }
 .tile-freq { font-weight: 600; font-size: 1.3125rem; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
 .tile-freq.is-long { font-size: 1.125rem; }
