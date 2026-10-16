@@ -535,23 +535,51 @@
     }).catch(function () { return withHttps(base); });
   }
 
+  // AzuraCast stations (NBC, Tribe FM, Wantok) publish what's on air themselves.
   function applyNowPlaying(st, data) {
-    if (!current || current.id !== st.id || !data) return;
+    if (!data) return;
     var song = data.now_playing && data.now_playing.song;
     var text = '';
     if (song) text = song.text || [song.artist, song.title].filter(Boolean).join(' – ');
     if (!text && data.live && data.live.is_live && data.live.streamer_name) text = 'Live with ' + data.live.streamer_name;
-    text = String(text || '').trim().slice(0, 140);
+    setNowPlaying(st, text);
+  }
+
+  // Stations often send a slogan or their own name instead of a song: hide those.
+  function squash(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
+  function setNowPlaying(st, text) {
+    if (!current || current.id !== st.id) return;
+    text = String(text || '').replace(/\s+/g, ' ').trim();
+    var flat = squash(text);
+    var own = [st.name].concat(st.match || []).map(squash).filter(function (w) { return w.length >= 5; });
+    if (!/[a-z]/i.test(text) || /^live( from the studio)?$/i.test(text) ||
+        own.some(function (w) { return flat.indexOf(w) >= 0; })) text = '';
+    text = text.slice(0, 140);
     if (text !== nowPlaying) { nowPlaying = text; renderPlayer(); updateMediaMeta(); }
   }
 
+  // Other stations: worker.js reads the song name the station sends inside its stream.
+  var nowApiFails = 0;
   function startNowPlaying() {
     clearInterval(timers.np);
-    var st = current;
-    if (!st || !st.resolve || st.resolve.type !== 'azuracast') return;
+    var st = current, poll;
+    if (!st) return;
+    if (st.resolve && st.resolve.type === 'azuracast') {
+      // The first answer came with the stream lookup; refresh from here on.
+      poll = function () { fetchJSON(st.resolve.api, 7000).then(function (d) { applyNowPlaying(st, d); }).catch(function () {}); };
+    } else {
+      var src = urls[goodIndex];
+      if (!src || /\.m3u8(\?|$)/i.test(src) || nowApiFails >= 3) return;
+      poll = function () {
+        fetchJSON('/api/now?u=' + encodeURIComponent(src), 9000)
+          .then(function (d) { nowApiFails = 0; setNowPlaying(st, d && d.title); })
+          .catch(function () { if (++nowApiFails >= 3) clearInterval(timers.np); });
+      };
+      poll();
+    }
     timers.np = setInterval(function () {
       if (current !== st || state !== 'live' || document.hidden) return;
-      fetchJSON(st.resolve.api, 7000).then(function (d) { applyNowPlaying(st, d); }).catch(function () {});
+      poll();
     }, 30000);
   }
 

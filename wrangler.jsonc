@@ -2,11 +2,15 @@
 // Cloudflare reads this file every time it deploys a push from GitHub.
 // The app is plain files, so there is no build step: the files at the top
 // level of the repo are served as they are (except those in .assetsignore).
+// worker.js only runs for /api/ addresses (the "now playing" lookup).
 {
   "name": "stratusradio",
   "compatibility_date": "2026-10-01",
+  "main": "worker.js",
   "assets": {
     "directory": ".",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"],
     // Addresses that aren't a file (like /yumi-fm, a shared station link)
     // open the app, which then picks that station.
     "not_found_handling": "single-page-application"
