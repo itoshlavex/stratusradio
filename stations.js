@@ -60,8 +60,8 @@ window.STRATUS_STATIONS = [
   },
   {
     id: 'nbc-national', country: 'PG',
-    name: 'NBC National Radio', freq: '', short: 'NBC',
-    city: 'Nationwide', lang: 'English, Tok Pisin',
+    name: 'NBC National Radio', freq: '90.7 FM',
+    city: 'Port Moresby', also: '585 AM, NBC stations nationwide', lang: 'English, Tok Pisin',
     desc: 'The national broadcaster: news, current affairs and talkback',
     cats: ['news'], tile: 'deep',
     resolve: { type: 'azuracast', api: 'https://natradio.nbc.com.pg/api/nowplaying/nbcnationalradio' },
@@ -70,9 +70,19 @@ window.STRATUS_STATIONS = [
     match: ['nbc national', 'karai', 'national broadcasting'], homepage: 'https://www.nbc.com.pg/listen'
   },
   {
+    id: 'tribe-fm', country: 'PG',
+    name: 'Tribe FM', freq: '92.3 FM',
+    city: 'Port Moresby',
+    desc: 'NBC’s youth station: new music, trends and talk',
+    cats: ['music'], tile: 'bright',
+    resolve: { type: 'azuracast', api: 'https://natradio.nbc.com.pg/api/nowplaying/tribe_fm' },
+    stream: ['https://natradio.nbc.com.pg/listen/tribe_fm/radio.mp3'],
+    match: ['tribe fm', 'tribe 92'], homepage: 'https://www.nbc.com.pg/'
+  },
+  {
     id: 'hope-radio-png', country: 'PG',
     name: 'Adventist Hope Radio', freq: '107.5 FM',
-    city: 'Lae',
+    city: 'Lae', also: 'Kokopo and Kimbe',
     desc: 'Seventh-day Adventist radio: gospel music, talk and Bible programmes',
     cats: ['christian'], tile: 'bright',
     stream: ['https://servidor30-3.brlogic.com:7020/live'],
@@ -94,7 +104,7 @@ window.STRATUS_STATIONS = [
     city: 'Port Moresby', also: 'Wewak, Lae, Mt Hagen, Mendi, Kimbe',
     lang: 'English', desc: 'Catholic radio',
     cats: ['christian'], tile: 'royal',
-    stream: ['https://dreamsiteradiocp2.com/proxy/rmpapua2?mp=/stream'],
+    stream: ['https://dreamsiteradiocp2.com/proxy/rmpapua2?mp=/stream', 'https://dreamsiteradiocp6.com/proxy/rmpapua?mp=/stream'],
     match: ['radio maria'], homepage: 'https://www.radiomariapng.org/'
   },
   {
@@ -103,7 +113,7 @@ window.STRATUS_STATIONS = [
     city: 'Wewak', also: '102.7 FM', lang: 'English',
     desc: 'Christian music and programmes from UCB PNG',
     cats: ['christian', 'music'], tile: 'sky',
-    stream: ['https://streams3.vision.org.au/png.aac'],
+    stream: ['https://streams3.vision.org.au/png.aac', 'https://streams2.vision.org.au/png.aac'],
     match: ['laif', 'ucb png'], homepage: 'https://www.laiffm.org/'
   },
   {
@@ -111,8 +121,17 @@ window.STRATUS_STATIONS = [
     name: 'Life Worship', freq: '', short: 'LW',
     city: 'Online', lang: 'English', desc: 'Non-stop worship music from UCB Asia Pacific',
     cats: ['christian', 'music'], tile: 'navy',
-    stream: ['https://streams2.vision.org.au/worshipap.aac'],
+    stream: ['https://streams2.vision.org.au/worshipap.aac', 'https://streams3.vision.org.au/worshipap.aac'],
     match: ['life worship', 'ucb asia'], homepage: 'https://www.laiffm.org/live/'
+  },
+  {
+    id: 'life-fm-bougainville', country: 'PG',
+    name: 'Life FM Bougainville', freq: '', short: 'LFB',
+    city: 'Buka',
+    lang: 'English', desc: 'Christian music and teaching from UCB, online ahead of an FM launch',
+    cats: ['christian', 'music'], tile: 'deep',
+    stream: ['https://streams3.vision.org.au/bougainville.aac', 'https://streams2.vision.org.au/bougainville.aac'],
+    match: ['life fm bougainville'], homepage: 'https://www.ucbasiapacific.org/projects/bougainville/'
   },
 
   /* ---------- Fiji ---------- */
@@ -158,51 +177,51 @@ window.STRATUS_STATIONS = [
   },
   {
     id: 'radio-fiji-one', country: 'FJ',
-    name: 'Radio Fiji One', freq: '', short: 'RF1',
-    city: 'Suva', lang: 'iTaukei (Fijian)', desc: 'FBC’s iTaukei station: news, talk and music',
+    name: 'Radio Fiji One', freq: '93 FM',
+    city: 'Suva', also: '558 AM and other FM frequencies', lang: 'iTaukei (Fijian)', desc: 'FBC’s iTaukei station: news, talk and music',
     cats: ['news', 'music'], tile: 'navy',
     stream: ['https://icecast1.sere.plus/RFOne'],
-    match: ['radio fiji one', 'rf1'], homepage: 'https://www.fbcnews.com.fj/'
+    match: ['radio fiji one', 'rf1'], homepage: 'https://www.fbc.com.fj/'
   },
   {
     id: 'bula-fm', country: 'FJ',
-    name: 'Bula FM', freq: '', short: 'BULA',
+    name: 'Bula FM', freq: '102.6 FM',
     city: 'Suva', lang: 'iTaukei (Fijian)', desc: 'Fijian music and entertainment from FBC',
     cats: ['music'], tile: 'sky',
     stream: ['https://icecast1.sere.plus/Bula'],
-    match: ['bula'], homepage: 'https://www.fbcnews.com.fj/'
+    match: ['bula'], homepage: 'https://www.fbc.com.fj/'
   },
   {
     id: 'radio-fiji-two', country: 'FJ',
-    name: 'Radio Fiji Two', freq: '', short: 'RF2',
-    city: 'Suva', lang: 'Fiji Hindi', desc: 'FBC’s Hindi station: news, talk and music',
+    name: 'Radio Fiji Two', freq: '105 FM',
+    city: 'Suva', also: 'other FM frequencies around Fiji', lang: 'Fiji Hindi', desc: 'FBC’s Hindi station: news, talk and music',
     cats: ['news', 'music'], tile: 'deep',
     stream: ['https://icecast1.sere.plus/RFTwo'],
-    match: ['radio fiji two', 'rf2'], homepage: 'https://www.fbcnews.com.fj/'
+    match: ['radio fiji two', 'rf2'], homepage: 'https://www.fbc.com.fj/'
   },
   {
     id: 'mirchi-fm', country: 'FJ',
-    name: 'Mirchi FM', freq: '', short: 'MIR',
+    name: 'Mirchi FM', freq: '97.8 FM',
     city: 'Suva', lang: 'Fiji Hindi', desc: 'Bollywood and Fiji Hindi hits from FBC',
     cats: ['music'], tile: 'bright',
     stream: ['https://icecast1.sere.plus/MirchiFiji'],
-    match: ['mirchi'], homepage: 'https://www.fbcnews.com.fj/'
+    match: ['mirchi'], homepage: 'https://www.fbc.com.fj/'
   },
   {
     id: 'gold-fm-fiji', country: 'FJ',
-    name: 'Gold FM', freq: '', short: 'GOLD',
-    city: 'Suva', lang: 'English', desc: 'FBC News, talk and classic hits',
+    name: 'Gold FM', freq: '100.2 FM',
+    city: 'Suva', lang: 'English', desc: 'Classic hits from the 70s, 80s and 90s, plus FBC News',
     cats: ['news', 'music'], tile: 'royal',
     stream: ['https://icecast1.sere.plus/Gold'],
-    match: ['gold fm'], homepage: 'https://www.fbcnews.com.fj/'
+    match: ['gold fm'], homepage: 'https://www.fbc.com.fj/'
   },
   {
     id: '2day-fm-fiji', country: 'FJ',
-    name: '2Day FM', freq: '', short: '2DAY',
+    name: '2Day FM', freq: '95.4 FM',
     city: 'Suva', lang: 'English', desc: 'Today’s hits from FBC',
     cats: ['music'], tile: 'ice',
     stream: ['https://icecast1.sere.plus/2Day'],
-    match: ['2day'], homepage: 'https://www.fbcnews.com.fj/'
+    match: ['2day'], homepage: 'https://www.fbc.com.fj/'
   },
   {
     id: 'life-fm-fiji', country: 'FJ',
@@ -257,6 +276,147 @@ window.STRATUS_STATIONS = [
     stream: ['https://webradio.lagoon.nc/rrb'],
     match: ['rythme bleu', 'rrb'], homepage: 'https://www.rrb.nc/'
   },
+  {
+    id: 'nc-1ere', country: 'NC',
+    name: 'Nouvelle-Calédonie la 1ère', freq: '', short: 'NC1',
+    city: 'Nouméa',
+    lang: 'French', desc: 'Public radio: news, local music and talk',
+    cats: ['news', 'music'], tile: 'navy',
+    stream: ['https://nouvelle-caledonie.ice.infomaniak.ch/nouvelle-caledonie-128.mp3'],
+    match: ['nouvelle-caledonie', 'caledonie la 1ere'], homepage: 'https://la1ere.franceinfo.fr/nouvellecaledonie/'
+  },
+  {
+    id: 'nrj-nc', country: 'NC',
+    name: 'NRJ Nouvelle-Calédonie', freq: '93.5 FM',
+    city: 'Nouméa',
+    lang: 'French', desc: 'Hit music',
+    cats: ['music'], tile: 'bright',
+    stream: ['https://testradio01.ice.infomaniak.ch/testradio01-192.mp3'],
+    match: ['nrj'], homepage: 'https://nrj.nc/'
+  },
+  {
+    id: 'radio-djiido', country: 'NC',
+    name: 'Radio Djiido', freq: '', short: 'DJI',
+    city: 'Nouméa',
+    lang: 'French', desc: 'Kanak community radio: news, talk and Pacific music',
+    cats: ['news', 'music'], tile: 'sky',
+    stream: ['https://djiido.nc/proxy/stream/96k', 'https://djiido.nc/proxy/stream/aac'],
+    match: ['djiido'], homepage: 'https://djiido.nc/'
+  },
+  {
+    id: 'nia-pacifique', country: 'NC',
+    name: 'NIA Pacifique', freq: '', short: 'NIA',
+    city: 'Nouméa',
+    lang: 'French', desc: 'Electronic music from Nouméa',
+    cats: ['music'], tile: 'royal',
+    stream: ['https://radio.nia.nc/radio/8000/pacific-hq-stream.aac'],
+    match: ['nia pacifique', 'nia radio'], homepage: 'https://nia.nc/'
+  },
+
+  /* ---------- Samoa ---------- */
+  {
+    id: 'radio-2ap', country: 'WS',
+    name: 'Radio 2AP', freq: '540 AM',
+    city: 'Apia',
+    lang: 'Samoan, English', desc: 'Samoa’s national radio since 1947: news, warnings and culture',
+    cats: ['news'], tile: 'navy',
+    stream: ['https://stream.zeno.fm/xe3v4z7gc2zuv'],
+    match: ['2ap'], homepage: 'https://mcit.gov.ws/divisions/broadcasting-division/'
+  },
+  {
+    id: 'magik-fm', country: 'WS',
+    name: 'Magik 98.1', freq: '98.1 FM',
+    city: 'Apia',
+    lang: 'English', desc: 'Hit music from Radio Polynesia',
+    cats: ['music'], tile: 'bright',
+    stream: ['https://ice5.securenetsystems.net/MAGIKFM'],
+    match: ['magik'], homepage: 'https://streamdb8web.securenetsystems.net/cirrusencore/MAGIKFM'
+  },
+  {
+    id: 'star-961', country: 'WS',
+    name: 'Star 96.1', freq: '96.1 FM',
+    city: 'Apia',
+    lang: 'English', desc: 'Music variety from Radio Polynesia',
+    cats: ['music'], tile: 'sky',
+    stream: ['https://ice26.securenetsystems.net/STAR961'],
+    match: ['star 96'], homepage: 'https://streamdb7web.securenetsystems.net/cirrusencore/STAR961'
+  },
+  {
+    id: 'talofa-fm', country: 'WS',
+    name: 'Talofa FM', freq: '', short: 'TAL',
+    city: 'Apia',
+    lang: 'Samoan', desc: 'Samoan-language music and talk from Radio Polynesia',
+    cats: ['music'], tile: 'royal',
+    stream: ['https://ice26.securenetsystems.net/TALOFAFM'],
+    match: ['talofa'], homepage: 'https://streamdb8web.securenetsystems.net/cirrusencore/TALOFAFM'
+  },
+  {
+    id: 'aiga-fesilafai', country: 'WS',
+    name: 'Aiga Fesilafai FM', freq: '', short: 'AF',
+    city: '',
+    lang: 'Samoan, English', desc: 'Catholic radio',
+    cats: ['christian'], tile: 'ice',
+    stream: ['https://stream.zeno.fm/lhh9kxksbzbtv'],
+    match: ['aiga fesilafai'], homepage: 'https://zeno.fm/radio/aigafesilafai-fm/'
+  },
+  {
+    id: 'laufou-ole-talalelei', country: 'WS',
+    name: 'Laufou ole Talalelei', freq: '', short: 'LT',
+    city: '',
+    lang: 'Samoan', desc: 'Youth for Christ radio',
+    cats: ['christian'], tile: 'deep',
+    stream: ['https://stream.zeno.fm/wmbu9tm76otvv'],
+    match: ['laufou'], homepage: 'https://zeno.fm/radio/laufouoletalalelei/'
+  },
+
+  /* ---------- American Samoa ---------- */
+  {
+    id: '93khj', country: 'AS',
+    name: '93KHJ', freq: '93.1 FM',
+    city: 'Pago Pago',
+    lang: 'English', desc: 'Hit music and KHJ News',
+    cats: ['music', 'news'], tile: 'royal',
+    stream: ['https://ice25.securenetsystems.net/KKHJ'],
+    match: ['khj'], homepage: 'https://www.southseasbroadcasting.com/93khj/'
+  },
+  {
+    id: 'v103', country: 'AS',
+    name: 'V103', freq: '103.1 FM',
+    city: 'Fagaitua',
+    lang: 'Samoan, English', desc: 'Samoan and Polynesian favourites',
+    cats: ['music'], tile: 'sky',
+    stream: ['https://ice26.securenetsystems.net/WVUV'],
+    match: ['v103', 'wvuv'], homepage: 'https://www.southseasbroadcasting.com/v103/'
+  },
+  {
+    id: 'the-beat-as', country: 'AS',
+    name: 'The Beat', freq: '104.7 FM',
+    city: 'Leone',
+    lang: 'English', desc: 'Hit music',
+    cats: ['music'], tile: 'bright',
+    stream: ['https://ice25.securenetsystems.net/KKBT'],
+    match: ['the beat', 'kkbt'], homepage: 'https://www.southseasbroadcasting.com/1047beat/'
+  },
+  {
+    id: 'oldies-937', country: 'AS',
+    name: 'Oldies 93.7', freq: '93.7 FM',
+    city: 'Pago Pago',
+    lang: 'English', desc: 'Good times and great oldies',
+    cats: ['music'], tile: 'ice',
+    stream: ['https://ice26.securenetsystems.net/KKHJHD2'],
+    match: ['oldies'], homepage: 'https://www.southseasbroadcasting.com/kkhjhd2/'
+  },
+
+  /* ---------- Tonga ---------- */
+  {
+    id: 'broadcom-fm', country: 'TO',
+    name: 'Broadcom FM', freq: '87.5 FM',
+    city: 'Nukuʻalofa',
+    lang: 'Tongan, English', desc: 'Community radio: news, talk, faith and Pacific music',
+    cats: ['news', 'music'], tile: 'navy',
+    stream: ['https://stream.zeno.fm/ame0ehzmb'],
+    match: ['broadcom'], homepage: 'https://broadcomfm.com/'
+  },
 
   /* ---------- French Polynesia ---------- */
   {
@@ -283,6 +443,15 @@ window.STRATUS_STATIONS = [
     stream: ['https://live.tiarefm.pf:8443/tiarefm'],
     match: ['tiare'], homepage: 'https://www.tiarefm.pf/'
   },
+  {
+    id: 'hiti-fm', country: 'PF',
+    name: 'Hiti FM', freq: '', short: 'HITI',
+    city: 'Tahiti',
+    lang: 'French', desc: 'Pop and hit music',
+    cats: ['music'], tile: 'royal',
+    stream: ['https://stream.radiojar.com/u0yz7p0mb', 'https://n01.radiojar.com/u0yz7p0mb.mp3'],
+    match: ['hiti'], homepage: 'https://hiti-fm.com/'
+  },
 
   /* ---------- Wallis and Futuna ---------- */
   {
@@ -294,6 +463,28 @@ window.STRATUS_STATIONS = [
     match: ['wallis'], homepage: 'https://la1ere.franceinfo.fr/wallisfutuna/'
   },
 
+  /* ---------- Kiribati ---------- */
+  {
+    id: 'radio-kiribati', country: 'KI',
+    name: 'Radio Kiribati', freq: '1440 AM',
+    city: 'South Tarawa',
+    desc: 'National radio: news and music',
+    cats: ['news', 'music'], tile: 'navy',
+    stream: ['https://streamer5.rightclickitservices.com:19790/stream'],
+    match: ['radio kiribati'], homepage: ''
+  },
+
+  /* ---------- Micronesia ---------- */
+  {
+    id: 'bible-baptist-chuuk', country: 'FM',
+    name: 'Bible Baptist Radio', freq: '88.5 FM',
+    city: 'Weno, Chuuk',
+    desc: 'Baptist Christian radio',
+    cats: ['christian'], tile: 'ice',
+    stream: ['https://streaming.radio.co/s25a6afba9/listen'],
+    match: ['bible baptist'], homepage: 'https://zeno.fm/radio/bible-baptist-radio-chuuk/'
+  },
+
   /* ---------- Guam ---------- */
   {
     id: 'power-98-guam', country: 'GU',
@@ -302,6 +493,60 @@ window.STRATUS_STATIONS = [
     cats: ['music'], tile: 'royal',
     stream: ['https://ice3.securenetsystems.net/KZGZ'],
     match: ['power 98', 'kzgz'], homepage: 'https://power98.com'
+  },
+  {
+    id: 'boss-1043', country: 'GU',
+    name: 'Boss 104.3', freq: '104.3 FM',
+    city: 'Tumon',
+    lang: 'English', desc: 'Adult contemporary hits',
+    cats: ['music'], tile: 'navy',
+    stream: ['https://ice10.securenetsystems.net/KIJI'],
+    match: ['boss', 'kiji'], homepage: 'https://boss104.gu/'
+  },
+  {
+    id: 'star-101', country: 'GU',
+    name: 'Star 101', freq: '101.1 FM',
+    city: 'Tumon',
+    lang: 'English', desc: 'Rhythmic and pop hits',
+    cats: ['music'], tile: 'bright',
+    stream: ['https://ice9.securenetsystems.net/KNUT'],
+    match: ['star 101', 'knut'], homepage: 'https://star101.gu/'
+  },
+  {
+    id: 'the-point-guam', country: 'GU',
+    name: 'The Point', freq: '93.3 FM',
+    city: 'Hagåtña', also: '1350 AM',
+    lang: 'English', desc: 'News and talk',
+    cats: ['news'], tile: 'deep',
+    stream: ['https://ice10.securenetsystems.net/KUSG'],
+    match: ['the point', 'kusg'], homepage: 'https://thepoint.gu/'
+  },
+  {
+    id: 'wave-1051', country: 'GU',
+    name: 'Wave 105.1', freq: '105.1 FM',
+    city: 'Dededo',
+    lang: 'English', desc: 'News and talk on weekdays, island music at weekends',
+    cats: ['news', 'music'], tile: 'sky',
+    stream: ['https://ice3.securenetsystems.net/KGUMFM'],
+    match: ['wave 105', 'kgum'], homepage: 'https://thewave105.com/'
+  },
+  {
+    id: 'harvest-family-radio', country: 'GU',
+    name: 'Harvest Family Radio', freq: '88.1 FM',
+    city: '',
+    lang: 'English', desc: 'Christian family radio',
+    cats: ['christian'], tile: 'ice',
+    stream: ['https://streaming.live365.com/a11295'],
+    match: ['harvest', 'khmg'], homepage: 'https://khmg.org/'
+  },
+  {
+    id: 'joy-fm-guam', country: 'GU',
+    name: 'Joy FM', freq: '91.9 FM',
+    city: 'Hågat', also: 'relays in Saipan, Majuro, Kwajalein, Pohnpei, Kosrae and Yap',
+    lang: 'English', desc: 'Seventh-day Adventist Christian radio for Guam and Micronesia',
+    cats: ['christian'], tile: 'royal',
+    stream: ['https://ice5.securenetsystems.net/JOYFM'],
+    match: ['joy fm', 'ksda'], homepage: 'https://joyfmradio.net/'
   },
 
   /* ---------- Pacific stations in New Zealand ---------- */
