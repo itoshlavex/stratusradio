@@ -60,35 +60,6 @@
   --player-edge: transparent;
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #061230;
-    --surface: #0E1F48;
-    --ink: #EAF2FF;
-    --muted: #9DB1D6;
-    --line: #1B2F5E;
-    --accent: #2F7BFF;
-    --accent-ink: #FFFFFF;
-    --focus: #5CCBFF;
-    --header-bg: #010C26;
-    --header-fg: #FFFFFF;
-    --header-sub: #8FD3FF;
-    --wave-back: #0B7BF7;
-    --player-bg: #010A20;
-    --player-fg: #FFFFFF;
-    --player-muted: #93A8CF;
-    --player-edge: rgba(159, 220, 255, 0.12);
-    --live: #3CCBFF;
-    --chip-on-bg: #EAF2FF;
-    --chip-on-fg: #021A4F;
-    --star-on: #3CCBFF;
-    --scrim: rgba(0, 4, 14, 0.7);
-    --tile-navy-bg: #12306F;   --tile-navy-fg: #3CCBFF;
-    --tile-ice-bg: #17366E;    --tile-ice-fg: #A9DEFF;
-    --tile-deep-bg: #0C3A9E;   --tile-deep-fg: #B4E7FF;
-    color-scheme: dark;
-  }
-}
 :root[data-theme="dark"] {
   --bg: #061230;
   --surface: #0E1F48;

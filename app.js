@@ -935,21 +935,15 @@
 
   /* ---------- Light / dark ---------- */
 
-  // 'auto' follows the phone. Each tap flips what's on screen; landing back on the
-  // phone's own setting goes back to 'auto', so the phone takes over again.
-  var theme = store.get('theme', 'auto');
-  if (theme !== 'light' && theme !== 'dark') theme = 'auto';
+  // Light by default; the header button switches to dark and the choice is remembered.
+  var theme = store.get('theme', 'light') === 'dark' ? 'dark' : 'light';
   var themeBtn = $('#theme-btn'), themeMeta = document.querySelector('meta[name="theme-color"]');
-  var darkQuery = window.matchMedia ? matchMedia('(prefers-color-scheme: dark)') : null;
-
-  function phoneTheme() { return darkQuery && darkQuery.matches ? 'dark' : 'light'; }
-  function shownTheme() { return theme === 'auto' ? phoneTheme() : theme; }
 
   function applyTheme() {
     var root = document.documentElement;
-    if (theme === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', theme);
-    var other = shownTheme() === 'dark' ? 'light' : 'dark';
-    themeBtn.setAttribute('data-mode', shownTheme());
+    if (theme === 'dark') root.setAttribute('data-theme', 'dark'); else root.removeAttribute('data-theme');
+    var other = theme === 'dark' ? 'light' : 'dark';
+    themeBtn.setAttribute('data-mode', theme);
     themeBtn.setAttribute('aria-label', 'Switch to ' + other + ' mode');
     themeBtn.title = 'Switch to ' + other + ' mode';
     // Match the phone's status bar to the header colour.
@@ -957,15 +951,10 @@
     if (themeMeta && bg) themeMeta.setAttribute('content', bg);
   }
   themeBtn.addEventListener('click', function () {
-    var next = shownTheme() === 'dark' ? 'light' : 'dark';
-    theme = next === phoneTheme() ? 'auto' : next;
+    theme = theme === 'dark' ? 'light' : 'dark';
     store.set('theme', theme);
     applyTheme();
   });
-  if (darkQuery) {
-    var onScheme = function () { if (theme === 'auto') applyTheme(); };
-    if (darkQuery.addEventListener) darkQuery.addEventListener('change', onScheme); else if (darkQuery.addListener) darkQuery.addListener(onScheme);
-  }
 
   // Fade the edge of a chip row while more chips are hidden off that side.
   function syncScrollHints(row) {
