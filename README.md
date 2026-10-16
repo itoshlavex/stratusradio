@@ -1,17 +1,16 @@
 # Stratus Radio
 
-Listen to Papua New Guinea radio stations online. Stratus Radio is a web app: it runs in any phone or computer browser, and you can install it on a phone's home screen.
+Live radio from across the Pacific. Stratus Radio is a web app: it runs in any phone or computer browser, and you can install it on a phone's home screen.
 
 ## Features
 
-- 11 built-in stations: Yumi FM, Legend FM, Nau FM, FM100, NBC National Radio, Wantok Radio Light, Radio Maria PNG, Laif FM, Life Worship, ABC Radio Australia and RNZ Pacific.
-- More PNG stations are added automatically from the free [Radio Browser](https://www.radio-browser.info/) directory.
-- Search by station, town or language, and filter by Music, News & talk, Christian or Pacific.
+- 30 built-in stations from Papua New Guinea, Fiji, Vanuatu, New Caledonia, French Polynesia, Wallis and Futuna, Guam, Pacific stations in New Zealand, plus RNZ Pacific and ABC Radio Australia.
+- More stations from every Pacific Island country (including Samoa, Tonga, Solomon Islands and Cook Islands when available) are added automatically from the free [Radio Browser](https://www.radio-browser.info/) directory.
+- Choose a country, filter by Music, News & talk or Christian, or search by station, town, country or language.
 - Favourites, saved on each phone.
 - Keeps playing with the screen locked. Play, pause and change station from the lock screen or headphones.
 - Sleep timer: 15 minutes to 2 hours, with a short fade-out.
 - Reconnects on its own when the signal drops.
-- Shows the time in PNG.
 
 ## Put it online with GitHub Pages (free)
 

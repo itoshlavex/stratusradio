@@ -1,7 +1,7 @@
 {
   "name": "Stratus Radio",
   "short_name": "Stratus",
-  "description": "Listen to Papua New Guinea radio stations online.",
+  "description": "Live radio from across the Pacific.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

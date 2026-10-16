@@ -18,9 +18,23 @@
     { id: 'fav', label: 'Favourites' },
     { id: 'music', label: 'Music' },
     { id: 'news', label: 'News & talk' },
-    { id: 'christian', label: 'Christian' },
-    { id: 'pacific', label: 'Pacific' }
+    { id: 'christian', label: 'Christian' }
   ];
+  // Country code, chip label, place name shown on rows (empty = city already says it).
+  var COUNTRIES = [
+    ['PG', 'PNG', 'PNG'], ['FJ', 'Fiji', 'Fiji'], ['SB', 'Solomon Is.', 'Solomon Islands'],
+    ['VU', 'Vanuatu', 'Vanuatu'], ['NC', 'New Caledonia', 'New Caledonia'], ['WS', 'Samoa', 'Samoa'],
+    ['AS', 'American Samoa', 'American Samoa'], ['TO', 'Tonga', 'Tonga'], ['PF', 'French Polynesia', 'French Polynesia'],
+    ['WF', 'Wallis & Futuna', 'Wallis and Futuna'], ['CK', 'Cook Is.', 'Cook Islands'], ['NU', 'Niue', 'Niue'],
+    ['TK', 'Tokelau', 'Tokelau'], ['TV', 'Tuvalu', 'Tuvalu'], ['KI', 'Kiribati', 'Kiribati'], ['NR', 'Nauru', 'Nauru'],
+    ['MH', 'Marshall Is.', 'Marshall Islands'], ['FM', 'Micronesia', 'Micronesia'], ['PW', 'Palau', 'Palau'],
+    ['GU', 'Guam', 'Guam'], ['MP', 'N. Marianas', 'Northern Mariana Islands'],
+    ['NZ', 'NZ Pacific', 'NZ'], ['XP', 'Pacific-wide', '']
+  ];
+  var COUNTRY = {};
+  COUNTRIES.forEach(function (c, i) { COUNTRY[c[0]] = { code: c[0], label: c[1], place: c[2], order: i }; });
+  // Countries looked up in the Radio Browser directory (not NZ: its hundreds of stations would bury the Pacific ones).
+  var DIR_COUNTRIES = COUNTRIES.map(function (c) { return c[0]; }).filter(function (c) { return c !== 'NZ' && c !== 'XP'; });
   var RB_HOSTS = [
     'https://de1.api.radio-browser.info',
     'https://de2.api.radio-browser.info',
@@ -40,7 +54,7 @@
     player: $('#player'), pTile: $('#p-tile'), pName: $('#p-name'), pStatus: $('#p-status'), pHelp: $('#p-help'),
     playBtn: $('#play-btn'), sleepBtn: $('#sleep-btn'), sleepLeft: $('#sleep-left'),
     sheet: $('#sleep-sheet'), sleepGrid: $('#sleep-grid'), sleepSub: $('#sleep-sub'), sleepOff: $('#sleep-off'),
-    clock: $('#clock-time'), dirStatus: $('#dir-status'),
+    countries: $('#countries'), dirStatus: $('#dir-status'),
     install: $('#install'), installBtn: $('#install-btn'), installIos: $('#install-ios')
   };
   var audio = $('#audio');
@@ -66,6 +80,8 @@
   var favs = new Set(store.get('favs', []));
   var filter = store.get('filter', 'all');
   if (!CATS.some(function (c) { return c.id === filter; })) filter = 'all';
+  var country = store.get('country', 'all');
+  if (country !== 'all' && !COUNTRY[country]) country = 'all';
   var query = '';
 
   /* ---------- Helpers ---------- */
@@ -138,7 +154,7 @@
 
   function rowHTML(st) {
     var fav = favs.has(st.id);
-    var places = st.city + (st.also ? ', ' + st.also : '');
+    var places = placeOf(st) + (st.also ? ' \u00b7 also ' + st.also : '');
     var meta = [st.lang, places].filter(Boolean).join(' · ');
     var badge = st.source === 'directory' ? '<span class="badge">Directory</span>' : '';
     return '<li class="st" data-id="' + esc(st.id) + '">' +
@@ -156,12 +172,35 @@
     '</li>';
   }
 
+  function placeOf(st) {
+    var c = COUNTRY[st.country];
+    var city = st.city || '';
+    if (!c || !c.place || c.place === city) return city;
+    return city ? city + ', ' + c.place : c.place;
+  }
+
   function matches(st) {
+    if (country !== 'all' && st.country !== country) return false;
     if (filter === 'fav' && !favs.has(st.id)) return false;
     if (filter !== 'all' && filter !== 'fav' && (st.cats || []).indexOf(filter) < 0) return false;
     if (!query) return true;
-    var hay = [st.name, st.freq, st.city, st.also, st.lang, st.desc, st.tags, st.short].join(' ').toLowerCase();
+    var c = COUNTRY[st.country] || {};
+    var hay = [st.name, st.freq, st.city, st.also, st.lang, st.desc, st.tags, st.short, c.label, c.place].join(' ').toLowerCase();
     return query.split(/\s+/).every(function (w) { return hay.indexOf(w) >= 0; });
+  }
+
+  function renderCountries() {
+    var counts = {};
+    allStations().forEach(function (st) { counts[st.country] = (counts[st.country] || 0) + 1; });
+    var codes = Object.keys(counts).filter(function (k) { return COUNTRY[k]; })
+      .sort(function (a, b) { return COUNTRY[a].order - COUNTRY[b].order; });
+    if (country !== 'all' && !counts[country]) country = 'all';
+    var html = '<button class="chip" type="button" data-country="all" aria-pressed="' + (country === 'all') + '">All Pacific</button>';
+    html += codes.map(function (k) {
+      return '<button class="chip" type="button" data-country="' + k + '" aria-pressed="' + (country === k) + '">' +
+        esc(COUNTRY[k].label) + '<span class="n">' + counts[k] + '</span></button>';
+    }).join('');
+    el.countries.innerHTML = html;
   }
 
   function renderChips() {
@@ -185,7 +224,7 @@
         el.emptyBody.textContent = 'Tap the star next to a station to keep it here.';
       } else {
         el.emptyTitle.textContent = 'No stations match';
-        el.emptyBody.textContent = 'Try another word, or clear the search.';
+        el.emptyBody.textContent = query ? 'Try another word, or clear the search.' : 'Try another type of station or another country.';
       }
     }
     syncRows();
@@ -249,7 +288,7 @@
     el.pName.textContent = current.name;
     el.playBtn.setAttribute('aria-label', isActive() ? 'Pause ' + current.name : 'Play ' + current.name);
 
-    var where = [current.freq, current.city].filter(Boolean).join(' · ');
+    var where = [current.freq, placeOf(current)].filter(Boolean).join(' · ');
     var html;
     switch (state) {
       case 'connecting': html = 'Connecting…'; break;
@@ -577,7 +616,7 @@
 
   function updateMediaMeta() {
     if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined' || !current) return;
-    var where = [current.freq, current.city].filter(Boolean).join(' · ');
+    var where = [current.freq, placeOf(current)].filter(Boolean).join(' · ');
     try {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: nowPlaying || current.name,
@@ -721,24 +760,40 @@
     if (!url) return null;
     return {
       uuid: s.stationuuid, name: String(s.name || '').trim(), url: url, url2: s.url,
+      cc: String(s.countrycode || '').toUpperCase(),
       tags: s.tags || '', state: s.state || '', lang: s.language || '', homepage: s.homepage || '',
       bitrate: s.bitrate || 0
     };
   }
 
+  // Some directory entries are tagged with every country; drop names that show up in 3 or more.
+  var SPAM = /abdul\s*basit|abdulsamad|quran|coran|holy\s*kuran/i;
+  function cleanDirectory(list) {
+    var where = {};
+    list.forEach(function (d) {
+      if (!d) return;
+      var n = norm(d.name);
+      (where[n] = where[n] || {})[d.cc] = 1;
+    });
+    return list.filter(function (d) {
+      return d && d.name && COUNTRY[d.cc] && !SPAM.test(d.name) && Object.keys(where[norm(d.name)]).length < 3;
+    });
+  }
+
   function toStation(d) {
     var text = (d.tags + ' ' + d.name).toLowerCase();
     var cats = [];
-    if (/christ|gospel|relig|catholic|church|worship|bible|adventist|faith|praise/.test(text)) cats.push('christian');
+    if (/christ|gospel|relig|catholic|church|worship|bible|adventist|faith|praise|lotu/.test(text)) cats.push('christian');
     if (/news|talk|information|current affairs/.test(text)) cats.push('news');
     if (/music|pop|hits|rock|reggae|hip ?hop|dance|r&b|country|island|contemporary|oldies/.test(text)) cats.push('music');
     var fm = /(\d{2,3}\.\d)\s*(fm)?/i.exec(d.name);
     var tagList = d.tags.split(',').map(function (t) { return t.trim(); }).filter(Boolean).slice(0, 3);
     var desc = tagList.length ? titleCase(tagList.join(', ')) : 'Online stream';
     if (d.bitrate) desc += ' · ' + d.bitrate + ' kbps';
+    var c = COUNTRY[d.cc];
     return {
-      id: 'rb-' + d.uuid, name: d.name, freq: fm ? fm[1] + ' FM' : '', short: initials(d.name),
-      city: titleCase(d.state) || 'PNG', lang: titleCase(d.lang), desc: desc, cats: cats,
+      id: 'rb-' + d.uuid, name: d.name, country: d.cc, freq: fm ? fm[1] + ' FM' : '', short: initials(d.name),
+      city: titleCase(d.state) || (c ? c.place : ''), lang: titleCase(d.lang), desc: desc, cats: cats,
       tile: hashPick(d.name, TILES), stream: uniq([d.url, d.url2]), homepage: d.homepage,
       tags: d.tags, uuid: d.uuid, source: 'directory'
     };
@@ -747,15 +802,15 @@
   function mergeDirectory(list) {
     builtIn.forEach(function (b) { b.stream = b.baseStream.slice(); });
     var out = [], seen = {};
-    list.forEach(function (d) {
-      if (!d || !d.name) return;
+    cleanDirectory(list).forEach(function (d) {
       var n = norm(d.name);
-      if (!n || seen[n]) return;
+      var key = d.cc + ':' + n;
+      if (!n || seen[key]) return;
       var twin = null;
       for (var i = 0; i < builtIn.length && !twin; i++) {
         var b = builtIn[i];
-        var nameHit = (b.match || []).some(function (m) { return n.indexOf(norm(m)) >= 0; });
         var urlHit = b.stream.some(function (u) { return sameUrl(u, d.url); });
+        var nameHit = b.country === d.cc && (b.match || []).some(function (m) { return n.indexOf(norm(m)) >= 0; });
         if (nameHit || urlHit) twin = b;
       }
       if (twin) {
@@ -763,20 +818,30 @@
         if (!twin.stream.some(function (u) { return sameUrl(u, d.url); })) twin.stream.push(d.url);
         return;
       }
-      seen[n] = 1;
+      seen[key] = 1;
       out.push(toStation(d));
     });
+    out.sort(function (a, b) { return COUNTRY[a.country].order - COUNTRY[b.country].order; });
     directory = out;
     if (!current) restoreLast();
     var link = '<a href="https://www.radio-browser.info/" target="_blank" rel="noopener">Radio Browser</a>';
     el.dirStatus.innerHTML = out.length
-      ? 'Also showing ' + out.length + ' more PNG station' + (out.length === 1 ? '' : 's') + ' from the ' + link + ' community directory, marked “Directory”.'
-      : 'The PNG stations in the ' + link + ' community directory are already in this list.';
+      ? 'Also showing ' + out.length + ' more Pacific station' + (out.length === 1 ? '' : 's') + ' from the ' + link + ' community directory, marked “Directory”. Some may be off air.'
+      : 'The Pacific stations in the ' + link + ' community directory are already in this list.';
+    renderCountries();
     renderList();
   }
 
+  function fetchCountry(host, cc) {
+    return fetchJSON(host + '/json/stations/search?countrycode=' + cc + '&hidebroken=true&order=clickcount&reverse=true&limit=100', 9000)
+      .then(function (data) {
+        if (!Array.isArray(data)) throw new Error('bad');
+        return data.map(slim).filter(Boolean).map(function (d) { d.cc = d.cc || cc; return d; });
+      });
+  }
+
   function loadDirectory() {
-    var cached = store.get('dir', null);
+    var cached = store.get('dir2', null);
     if (cached && Array.isArray(cached.list)) { rbHost = cached.host || ''; mergeDirectory(cached.list); }
     if (cached && Date.now() - cached.t < 6 * 3600 * 1000) return;
     if (!navigator.onLine) {
@@ -784,41 +849,39 @@
       return;
     }
     var hosts = shuffled(RB_HOSTS.slice(0, 3)).concat(RB_HOSTS.slice(3));
+    // Find a directory server that answers, using PNG as the first lookup.
     (function tryHost(i) {
       if (i >= hosts.length) {
         if (!cached) el.dirStatus.textContent = 'Couldn’t reach the Radio Browser directory, so only the built-in stations are showing.';
         return;
       }
       var host = hosts[i];
-      fetchJSON(host + '/json/stations/search?countrycode=PG&hidebroken=true&order=clickcount&reverse=true&limit=200', 8000)
-        .then(function (data) {
-          if (!Array.isArray(data)) throw new Error('bad');
-          var list = data.map(slim).filter(Boolean);
-          rbHost = host;
-          store.set('dir', { t: Date.now(), host: host, list: list });
-          mergeDirectory(list);
-        })
-        .catch(function () { tryHost(i + 1); });
+      fetchCountry(host, DIR_COUNTRIES[0]).then(function (first) {
+        rbHost = host;
+        var all = first.slice();
+        var rest = DIR_COUNTRIES.slice(1);
+        var next = 0;
+        // Look up the other countries, four at a time.
+        function worker() {
+          if (next >= rest.length) return Promise.resolve();
+          var cc = rest[next++];
+          return fetchCountry(host, cc).then(function (l) { all = all.concat(l); }, function () {}).then(worker);
+        }
+        return Promise.all([worker(), worker(), worker(), worker()]).then(function () {
+          store.set('dir2', { t: Date.now(), host: host, list: all });
+          mergeDirectory(all);
+        });
+      }).catch(function () { tryHost(i + 1); });
     })(0);
   }
 
+  try { localStorage.removeItem('stratus:dir'); } catch (e) {}
   var counted = {};
   function countListen(st) {
     // Radio Browser asks apps to report a listen so popular stations rise in the directory.
     if (!st || st.source !== 'directory' || counted[st.id] || !rbHost) return;
     counted[st.id] = 1;
     try { fetch(rbHost + '/json/url/' + encodeURIComponent(st.uuid), { mode: 'cors' }).catch(function () {}); } catch (e) {}
-  }
-
-  /* ---------- PNG clock ---------- */
-
-  var clockFmt = null;
-  try {
-    clockFmt = new Intl.DateTimeFormat('en-AU', { timeZone: 'Pacific/Port_Moresby', hour: 'numeric', minute: '2-digit', hour12: true });
-  } catch (e) { clockFmt = null; }
-  function tickClock() {
-    if (!clockFmt) { el.clock.parentNode.hidden = true; return; }
-    el.clock.textContent = clockFmt.format(new Date()).replace(/\s*([ap])\.?m\.?/i, function (m, p) { return ' ' + p.toLowerCase() + 'm'; });
   }
 
   /* ---------- Install ---------- */
@@ -865,6 +928,15 @@
     renderList();
   });
 
+  el.countries.addEventListener('click', function (e) {
+    var b = e.target.closest('.chip');
+    if (!b) return;
+    country = b.getAttribute('data-country');
+    store.set('country', country);
+    renderCountries();
+    renderList();
+  });
+
   el.q.addEventListener('input', function () {
     query = el.q.value.trim().toLowerCase();
     renderList();
@@ -890,7 +962,7 @@
     togglePlay();
   });
   document.addEventListener('visibilitychange', function () {
-    if (!document.hidden) { tickClock(); checkSleep(); }
+    if (!document.hidden) checkSleep();
   });
 
   /* ---------- Start ---------- */
@@ -900,13 +972,16 @@
     if (last) { current = last; state = 'idle'; renderPlayer(); syncRows(); updateMediaMeta(); }
   }
 
+  renderCountries();
   renderChips();
   renderList();
   restoreLast();
+  (function () {
+    var on = el.countries.querySelector('[aria-pressed="true"]');
+    if (on && on.getAttribute('data-country') !== 'all') el.countries.scrollLeft = Math.max(0, on.offsetLeft - 24);
+  })();
   renderPlayer();
   renderSleep();
-  tickClock();
-  setInterval(tickClock, 15000);
   loadDirectory();
 
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {

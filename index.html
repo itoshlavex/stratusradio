@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Stratus Radio</title>
-<meta name="description" content="Listen to Papua New Guinea radio stations online: Yumi FM, Legend FM, Nau FM, FM100, NBC and more.">
+<meta name="description" content="Listen to radio from across the Pacific: Papua New Guinea, Fiji, Vanuatu, Samoa, Tonga, Tahiti and more.">
 <meta name="theme-color" content="#021A4F">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -25,12 +25,8 @@
     <img class="logo" src="logo.png" width="64" height="64" alt="">
     <div class="brand">
       <h1 class="wordmark" aria-label="Stratus Radio"><span class="w1">stratus</span><span class="w2">radio</span></h1>
-      <p class="tagline">Harim redio bilong PNG</p>
+      <p class="tagline">Live radio from across the Pacific</p>
     </div>
-    <p class="clock" title="Time in Papua New Guinea">
-      <span class="clock-label">PNG time</span>
-      <span class="clock-time" id="clock-time">--:--</span>
-    </p>
   </div>
   <svg class="wave" viewBox="0 0 1440 48" preserveAspectRatio="none" aria-hidden="true" focusable="false">
     <path class="wave-back" d="M0,0H1440V30C1140,48 900,12 600,26C360,37 160,42 0,28Z"/>
@@ -42,10 +38,11 @@
   <div class="tools">
     <label class="search" for="q">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
-      <input id="q" type="search" placeholder="Search stations, towns, languages" autocomplete="off" enterkeyhint="search">
+      <input id="q" type="search" placeholder="Search stations, countries, languages" autocomplete="off" enterkeyhint="search">
       <span class="visually-hidden">Search stations</span>
     </label>
-    <div class="chips" id="chips" role="group" aria-label="Filter stations"></div>
+    <div class="chips" id="countries" role="group" aria-label="Choose a country"></div>
+    <div class="chips chips-sub" id="chips" role="group" aria-label="Type of station"></div>
   </div>
 
   <p class="count" id="count" aria-live="polite"></p>
