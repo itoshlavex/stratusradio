@@ -545,6 +545,29 @@
     setNowPlaying(st, text);
   }
 
+  // Many stations send titles in capitals ("CHER - JUST LIKE JESSE JAMES").
+  // Turn those into normal capitals and use a dot between the parts: "Cher · Just like Jesse James".
+  var SMALL_WORDS = { a: 1, an: 1, the: 1, and: 1, but: 1, or: 1, nor: 1, as: 1, at: 1, by: 1, 'for': 1, 'in': 1, of: 1, on: 1, to: 1, vs: 1, via: 1, 'with': 1, from: 1, like: 1, feat: 1, ft: 1 };
+  var KEEP_CAPS = { DJ: 1, MC: 1, INXS: 1, ABBA: 1, TLC: 1, UB40: 1, 'AC/DC': 1, 'R&B': 1, UK: 1, USA: 1, NZ: 1, PNG: 1, LMFAO: 1, TV: 1, II: 1, III: 1, IV: 1 };
+  function fromCapitals(part) {
+    var upper = (part.match(/[A-Z]/g) || []).length, lower = (part.match(/[a-z]/g) || []).length;
+    if (upper < 3 || lower > upper * 0.15) return part; // already in normal capitals
+    var words = part.split(' ');
+    return words.map(function (w, i) {
+      var bare = w.replace(/^[("'‘“]+|[)"'’”,.!?:;]+$/g, '');
+      if (KEEP_CAPS[bare]) return w;
+      var low = w.toLowerCase();
+      var startsGroup = i === 0 || /^[("'‘“]/.test(w) || /[(]$/.test(words[i - 1] || '');
+      if (!startsGroup && SMALL_WORDS[bare.toLowerCase().replace(/\.$/, '')]) return low;
+      // Capital at the start, and after ( - / , inside the word ("LOVE(TO" -> "Love(To")
+      return low.replace(/^([^a-z0-9]*)([a-z])/, function (m, p, c) { return p + c.toUpperCase(); })
+        .replace(/([(\/,-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+    }).join(' ');
+  }
+  function prettyTitle(text) {
+    return text.replace(/,(?=[^\s\d])/g, ', ').split(/\s+[-–—]\s+/).map(fromCapitals).join(' · ');
+  }
+
   // Stations often send a slogan or their own name instead of a song: hide those.
   function squash(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
   function setNowPlaying(st, text) {
@@ -554,7 +577,7 @@
     var own = [st.name].concat(st.match || []).map(squash).filter(function (w) { return w.length >= 5; });
     if (!/[a-z]/i.test(text) || /^live( from the studio)?$/i.test(text) ||
         own.some(function (w) { return flat.indexOf(w) >= 0; })) text = '';
-    text = text.slice(0, 140);
+    text = prettyTitle(text).slice(0, 140);
     if (text !== nowPlaying) { nowPlaying = text; renderPlayer(); updateMediaMeta(); }
   }
 
