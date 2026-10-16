@@ -43,7 +43,7 @@
     list: $('#list'), chips: $('#chips'), q: $('#q'), count: $('#count'),
     empty: $('#empty'), emptyTitle: $('#empty-title'), emptyBody: $('#empty-body'),
     player: $('#player'), pTile: $('#p-tile'), pName: $('#p-name'), pStatus: $('#p-status'), pHelp: $('#p-help'),
-    playBtn: $('#play-btn'), shareBtn: $('#share-btn'), sleepBtn: $('#sleep-btn'), sleepLeft: $('#sleep-left'), toast: $('#toast'),
+    playBtn: $('#play-btn'), sleepBtn: $('#sleep-btn'), sleepLeft: $('#sleep-left'), toast: $('#toast'),
     sheet: $('#sleep-sheet'), sleepGrid: $('#sleep-grid'), sleepSub: $('#sleep-sub'), sleepOff: $('#sleep-off'),
     countries: $('#countries')
   };
@@ -118,6 +118,7 @@
     if (f) return '<span class="tile-freq' + (f.num.length > 4 ? ' is-long' : '') + '">' + esc(f.num) + '</span><span class="tile-band">' + esc(f.band) + '</span>';
     return '<span class="tile-short">' + esc(st.short || initials(st.name)) + '</span>';
   }
+  var SHARE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14.5V3.5M7.5 7.5 12 3l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v6A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5v-6a1.5 1.5 0 0 0-1.5-1.5H16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
   var STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
 
   function rowHTML(st) {
@@ -134,6 +135,7 @@
         '</span>' +
         '<span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>' +
       '</button>' +
+      '<button class="share" type="button" aria-label="Share ' + esc(st.name) + '">' + SHARE + '</button>' +
       '<button class="fav" type="button" aria-pressed="' + fav + '" aria-label="' +
         (fav ? 'Remove ' : 'Add ') + esc(st.name) + (fav ? ' from' : ' to') + ' favourites">' + STAR + '</button>' +
     '</li>';
@@ -243,7 +245,6 @@
   function renderPlayer() {
     el.player.setAttribute('data-state', state);
     el.playBtn.disabled = !current;
-    el.shareBtn.disabled = !current;
     el.pHelp.hidden = true;
     if (!current) {
       el.pTile.className = 'tile tile-sm';
@@ -731,6 +732,7 @@
     if (!st) return;
     var favBtn = e.target.closest('.fav');
     if (favBtn) { toggleFav(st, favBtn); return; }
+    if (e.target.closest('.share')) { shareStation(st); return; }
     if (e.target.closest('.st-main')) playStation(st);
   });
 
@@ -869,9 +871,9 @@
     }
   }
 
-  function shareStation() {
-    if (!current) return;
-    var st = current, url = stationLink(st);
+  function shareStation(st) {
+    if (!st) return;
+    var url = stationLink(st);
     var where = [st.freq, placeOf(st)].filter(Boolean).join(', ');
     var data = { title: st.name + ' on Stratus Radio', text: 'Listen to ' + st.name + (where ? ' (' + where + ')' : '') + ' live on Stratus Radio', url: url };
     if (navigator.share) {
@@ -883,7 +885,6 @@
       copyText(url);
     }
   }
-  el.shareBtn.addEventListener('click', shareStation);
 
   // Opened from a shared link: pick that station and show it, ready to play.
   function openSharedStation() {
