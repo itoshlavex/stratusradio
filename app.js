@@ -29,7 +29,7 @@
     ['TK', 'Tokelau', 'Tokelau'], ['TV', 'Tuvalu', 'Tuvalu'], ['KI', 'Kiribati', 'Kiribati'], ['NR', 'Nauru', 'Nauru'],
     ['MH', 'Marshall Is.', 'Marshall Islands'], ['FM', 'Micronesia', 'Micronesia'], ['PW', 'Palau', 'Palau'],
     ['GU', 'Guam', 'Guam'], ['MP', 'N. Marianas', 'Northern Mariana Islands'],
-    ['NZ', 'NZ Pacific', 'NZ'], ['XP', 'Pacific-wide', '']
+    ['NZ', 'New Zealand', 'NZ'], ['XP', 'Pacific-wide', '']
   ];
   var COUNTRY = {};
   COUNTRIES.forEach(function (c, i) { COUNTRY[c[0]] = { code: c[0], label: c[1], place: c[2], order: i }; });

@@ -328,11 +328,211 @@ window.STRATUS_STATIONS = [
     ],
     match: ['niu fm', 'niufm'], homepage: 'https://pmn.co.nz/radio-stations/niu-fm'
   },
+  {
+    id: 'planet-fm', country: 'NZ',
+    name: 'Planet FM', freq: '104.6 FM',
+    city: 'Auckland',
+    lang: 'Many languages', desc: 'Community radio with programmes in many Pacific and world languages',
+    cats: ['news', 'music'], tile: 'ice',
+    stream: ['https://live.accessmedia.nz/PlanetFM.stream/playlist.m3u8', 'https://live.accessmedia.nz/PlanetFM.stream_aac/playlist.m3u8'],
+    homepage: 'https://www.planetaudio.org.nz/'
+  },
+
+  /* ---------- New Zealand ---------- */
+  {
+    id: 'rnz-national', country: 'NZ',
+    name: 'RNZ National', freq: '', short: 'RNZ',
+    city: 'Wellington', also: 'AM and FM across NZ',
+    lang: 'English', desc: 'Public radio: news, current affairs and documentaries',
+    cats: ['news'], tile: 'navy',
+    stream: ['https://radionz.streamguys1.com/national/national/playlist.m3u8'],
+    homepage: 'https://www.rnz.co.nz/national'
+  },
+  {
+    id: 'rnz-concert', country: 'NZ',
+    name: 'RNZ Concert', freq: '', short: 'RNZC',
+    city: 'Wellington', also: 'FM across NZ',
+    lang: 'English', desc: 'Classical music, jazz and the arts',
+    cats: ['music'], tile: 'deep',
+    stream: ['https://radionz.streamguys1.com/concert/concert/playlist.m3u8'],
+    homepage: 'https://www.rnz.co.nz/concert'
+  },
+  {
+    id: 'newstalk-zb', country: 'NZ',
+    name: 'Newstalk ZB', freq: '', short: 'ZB',
+    city: 'Auckland', also: 'FM network across NZ',
+    lang: 'English', desc: 'News, talkback and sport',
+    cats: ['news'], tile: 'royal',
+    stream: ['https://playerservices.streamtheworld.com/api/livestream-redirect/NZME_01AAC_SC'],
+    homepage: 'https://www.newstalkzb.co.nz/'
+  },
+  {
+    id: 'zm', country: 'NZ',
+    name: 'ZM', freq: '', short: 'ZM',
+    city: 'Auckland', also: 'FM network across NZ',
+    lang: 'English', desc: 'Today’s hit music',
+    cats: ['music'], tile: 'bright',
+    stream: ['https://playerservices.streamtheworld.com/api/livestream-redirect/NZME_03AAC_SC'],
+    homepage: 'https://www.zmonline.com/'
+  },
+  {
+    id: 'the-hits', country: 'NZ',
+    name: 'The Hits', freq: '', short: 'HITS',
+    city: 'Auckland', also: 'FM network across NZ',
+    lang: 'English', desc: 'Hit music from the 2000s to now',
+    cats: ['music'], tile: 'sky',
+    stream: ['https://playerservices.streamtheworld.com/api/livestream-redirect/NZME_02AAC_SC'],
+    homepage: 'https://www.thehits.co.nz/'
+  },
+  {
+    id: 'coast', country: 'NZ',
+    name: 'Coast', freq: '', short: 'CST',
+    city: 'Auckland', also: 'FM network across NZ',
+    lang: 'English', desc: 'Easy hits from the 70s, 80s and 90s',
+    cats: ['music'], tile: 'ice',
+    stream: ['https://playerservices.streamtheworld.com/api/livestream-redirect/NZME_07AAC_SC'],
+    homepage: 'https://www.thecoast.net.nz/'
+  },
+  {
+    id: 'radio-hauraki', country: 'NZ',
+    name: 'Radio Hauraki', freq: '', short: 'HRK',
+    city: 'Auckland', also: 'FM network across NZ',
+    lang: 'English', desc: 'Rock, comedy and sport banter',
+    cats: ['music'], tile: 'navy',
+    stream: ['https://playerservices.streamtheworld.com/api/livestream-redirect/NZME_04AAC_SC'],
+    homepage: 'https://www.hauraki.co.nz/'
+  },
+  {
+    id: 'flava', country: 'NZ',
+    name: 'Flava', freq: '', short: 'FLV',
+    city: 'Auckland', also: 'FM network across NZ',
+    lang: 'English', desc: 'Hip-hop and R&B',
+    cats: ['music'], tile: 'royal',
+    stream: ['https://playerservices.streamtheworld.com/api/livestream-redirect/NZME_08AAC_SC'],
+    homepage: 'https://www.flava.co.nz/'
+  },
+  {
+    id: 'iheartcountry', country: 'NZ',
+    name: 'iHeartCountry', freq: '', short: 'CTRY',
+    city: 'Auckland', also: 'FM network across NZ',
+    lang: 'English', desc: 'Country music',
+    cats: ['music'], tile: 'deep',
+    stream: ['https://playerservices.streamtheworld.com/api/livestream-redirect/NZME_09AAC_SC'],
+    homepage: 'https://www.iheartcountry.co.nz/'
+  },
+  {
+    id: 'the-rock', country: 'NZ',
+    name: 'The Rock', freq: '', short: 'ROCK',
+    city: 'Auckland', also: 'FM network across NZ',
+    lang: 'English', desc: 'Rock music and comedy',
+    cats: ['music'], tile: 'navy',
+    stream: ['https://mediaworks.streamguys1.com/rock_net_icy'],
+    homepage: 'https://www.rova.nz/radio/the-rock'
+  },
+  {
+    id: 'the-edge', country: 'NZ',
+    name: 'The Edge', freq: '', short: 'EDGE',
+    city: 'Auckland', also: 'FM network across NZ',
+    lang: 'English', desc: 'Today’s hits',
+    cats: ['music'], tile: 'bright',
+    stream: ['https://mediaworks.streamguys1.com/edge_net_icy'],
+    homepage: 'https://www.rova.nz/radio/the-edge'
+  },
+  {
+    id: 'more-fm', country: 'NZ',
+    name: 'More FM', freq: '', short: 'MORE',
+    city: 'Auckland', also: 'FM network across NZ',
+    lang: 'English', desc: 'Feel-good hits',
+    cats: ['music'], tile: 'sky',
+    stream: ['https://mediaworks.streamguys1.com/more_net_icy'],
+    homepage: 'https://www.rova.nz/radio/more-fm'
+  },
+  {
+    id: 'the-breeze', country: 'NZ',
+    name: 'The Breeze', freq: '', short: 'BRZ',
+    city: 'Auckland', also: 'FM network across NZ',
+    lang: 'English', desc: 'Easy listening favourites',
+    cats: ['music'], tile: 'ice',
+    stream: ['https://mediaworks.streamguys1.com/breeze_net_icy'],
+    homepage: 'https://www.rova.nz/radio/the-breeze'
+  },
+  {
+    id: 'mai-fm', country: 'NZ',
+    name: 'Mai FM', freq: '', short: 'MAI',
+    city: 'Auckland', also: 'FM network across NZ',
+    lang: 'English', desc: 'Hip-hop and R&B',
+    cats: ['music'], tile: 'royal',
+    stream: ['https://mediaworks.streamguys1.com/mai_net_icy'],
+    homepage: 'https://www.rova.nz/radio/mai-fm'
+  },
+  {
+    id: 'george-fm', country: 'NZ',
+    name: 'George FM', freq: '', short: 'GEO',
+    city: 'Auckland', also: 'FM network across NZ',
+    lang: 'English', desc: 'Dance and electronic music',
+    cats: ['music'], tile: 'deep',
+    stream: ['https://mediaworks.streamguys1.com/george_net_icy'],
+    homepage: 'https://www.rova.nz/radio/george-fm'
+  },
+  {
+    id: 'the-sound', country: 'NZ',
+    name: 'The Sound', freq: '', short: 'SND',
+    city: 'Auckland', also: 'FM network across NZ',
+    lang: 'English', desc: 'Classic rock',
+    cats: ['music'], tile: 'navy',
+    stream: ['https://mediaworks.streamguys1.com/sound_net_icy'],
+    homepage: 'https://www.rova.nz/radio/the-sound'
+  },
+  {
+    id: 'magic', country: 'NZ',
+    name: 'Magic', freq: '', short: 'MGC',
+    city: 'Auckland', also: 'FM network across NZ',
+    lang: 'English', desc: 'Classic hits',
+    cats: ['music'], tile: 'bright',
+    stream: ['https://mediaworks.streamguys1.com/magic_net_icy'],
+    homepage: 'https://www.rova.nz/radio/magic'
+  },
+  {
+    id: 'life-fm-nz', country: 'NZ',
+    name: 'Life FM', freq: '', short: 'LIFE',
+    city: 'Auckland', also: 'FM network across NZ',
+    lang: 'English', desc: 'Christian music for a younger crowd',
+    cats: ['christian', 'music'], tile: 'sky',
+    stream: ['https://rhema-radio.streamguys1.com/rhema-lifefm.mp3'],
+    homepage: 'https://www.lifefm.co.nz/'
+  },
+  {
+    id: 'rhema', country: 'NZ',
+    name: 'Rhema', freq: '', short: 'RHM',
+    city: 'Auckland', also: 'FM network across NZ',
+    lang: 'English', desc: 'Christian music, talk and teaching',
+    cats: ['christian'], tile: 'ice',
+    stream: ['https://rhema-radio.streamguys1.com/rhema.mp3'],
+    homepage: 'https://www.rhema.co.nz/'
+  },
+  {
+    id: '95bfm', country: 'NZ',
+    name: '95bFM', freq: '95.0 FM',
+    city: 'Auckland',
+    lang: 'English', desc: 'Independent student radio: new music and talk',
+    cats: ['music'], tile: 'deep',
+    stream: ['https://streams.95bfm.com/stream95', 'https://streams.95bfm.com/stream128'],
+    homepage: 'https://95bfm.com/'
+  },
+  {
+    id: 'tahu-fm', country: 'NZ',
+    name: 'Tahu FM', freq: '', short: 'TAHU',
+    city: 'Christchurch',
+    lang: 'Māori, English', desc: 'Ngāi Tahu radio: music and kōrero',
+    cats: ['music'], tile: 'royal',
+    stream: ['https://icast1.streamcom.net/TahuFM'],
+    homepage: 'https://tahufm.online/'
+  },
 
   /* ---------- Pacific-wide services ---------- */
   {
     id: 'rnz-pacific', country: 'XP',
-    name: 'RNZ Pacific', freq: '', short: 'RNZ',
+    name: 'RNZ Pacific', freq: '', short: 'RNZP',
     city: 'Wellington, NZ', lang: 'English', desc: 'Pacific news from Radio New Zealand',
     cats: ['news'], tile: 'navy',
     stream: ['https://radionz.streamguys1.com/pacific/pacific/playlist.m3u8'],
