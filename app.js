@@ -1082,6 +1082,7 @@
   renderPlayer();
   renderSleep();
   applyTheme();
+  try { document.getElementById('year').textContent = new Date().getFullYear(); } catch (e) {}
   syncPlayerSpace();
   syncAllHints();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncAllHints);

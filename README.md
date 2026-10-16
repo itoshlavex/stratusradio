@@ -1,6 +1,6 @@
 # Stratus Radio
 
-Live radio from across the Pacific. Stratus Radio is a web app: it runs in any phone or computer browser, and you can install it on a phone's home screen.
+Live radio from across the Pacific, by [Ololio Hill Technologies](https://www.ololiohill.io/). Stratus Radio is a web app: it runs in any phone or computer browser, and you can install it on a phone's home screen.
 
 ## Features
 
