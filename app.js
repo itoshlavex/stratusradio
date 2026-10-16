@@ -144,14 +144,15 @@
 
   function rowHTML(st) {
     var fav = favs.has(st.id);
-    var places = placeOf(st) + (st.also ? ' \u00b7 also ' + st.also : '');
-    var meta = [st.freq, st.lang, places].filter(Boolean).join(' · ');
+    // "also …" (other towns/frequencies) is hidden on phones, where it would be cut off.
+    var meta = esc([st.freq, st.lang, placeOf(st)].filter(Boolean).join(' · ')) +
+      (st.also ? '<span class="st-also"> · also ' + esc(st.also) + '</span>' : '');
     return '<li class="st" data-id="' + esc(st.id) + '">' +
       '<button class="st-main" type="button" aria-label="Play ' + esc(st.name) + '">' +
         '<span class="' + esc(tileClass(st)) + '" aria-hidden="true">' + tileHTML(st) + '</span>' +
         '<span class="st-text">' +
           '<span class="st-name">' + esc(st.name) + '</span>' +
-          (meta ? '<span class="st-meta">' + esc(meta) + '</span>' : '') +
+          (meta ? '<span class="st-meta">' + meta + '</span>' : '') +
           (st.desc ? '<span class="st-desc">' + esc(st.desc) + '</span>' : '') +
         '</span>' +
         '<span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>' +
