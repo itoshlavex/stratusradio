@@ -368,13 +368,15 @@ button { font: inherit; color: inherit; }
   display: inline-block; max-width: calc(100% - 13px); vertical-align: bottom;
   overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
 }
-.p-scroll-in { display: inline-block; }
+.p-scroll-in { display: inline-flex; white-space: nowrap; will-change: transform; }
+.p-scroll-t { flex: none; }
 .p-scroll.is-long {
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 6px, #000 calc(100% - 16px), transparent);
-  mask-image: linear-gradient(to right, transparent, #000 6px, #000 calc(100% - 16px), transparent);
+  width: calc(100% - 13px);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 10px, #000 calc(100% - 16px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 10px, #000 calc(100% - 16px), transparent);
 }
 @media (prefers-reduced-motion: reduce) {
-  .p-scroll-in { display: inline; }
+  .p-scroll-in, .p-scroll-t { display: inline; }
   .p-scroll.is-long { -webkit-mask-image: none; mask-image: none; }
 }
 .p-status a { color: var(--player-fg); }

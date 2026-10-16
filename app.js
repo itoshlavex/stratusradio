@@ -288,7 +288,7 @@
       case 'buffering': html = 'Weak signal, buffering…'; break;
       case 'live':
         html = '<span class="live-dot"></span>' + (nowPlaying
-          ? '<span class="p-scroll"><span class="p-scroll-in">' + esc(nowPlaying) + '</span></span>'
+          ? '<span class="p-scroll"><span class="p-scroll-in"><span class="p-scroll-t">' + esc(nowPlaying) + '</span></span></span>'
           : 'Live' + (where ? ' · ' + esc(where) : ''));
         break;
       case 'reconnecting': html = 'Signal dropped. Reconnecting (' + retries + ' of ' + MAX_RETRIES + ')…'; break;
@@ -306,30 +306,32 @@
     syncMarquee();
   }
 
-  // A song title too long for the player scrolls slowly: it waits 3 s so the start can be
-  // read, moves at 30 px a second, holds 2 s at the end, fades and starts again.
+  // A song title too long for the player scrolls like a ticker: after 3 s it moves left
+  // at 30 px a second without stopping, with the start following the end after a gap.
   // Phones set to reduce motion keep it still, ending in "…".
   var marquee = null;
+  var MARQUEE_GAP = 40;
   var reduceMotion = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : null;
   function syncMarquee() {
     if (marquee) { marquee.cancel(); marquee = null; }
-    var box = el.pStatus.querySelector('.p-scroll'), text = box && box.firstChild;
-    if (!box || !text) return;
-    var over = text.scrollWidth - box.clientWidth;
-    box.classList.toggle('is-long', over > 1);
-    if (over <= 1 || !text.animate || (reduceMotion && reduceMotion.matches)) return;
-    over += 20; // carry the last word clear of the fade at the right edge
-    var fade = 300, wait = 3000, move = over / 30 * 1000, hold = 2000;
-    var total = wait + move + hold + fade, at = function (ms) { return ms / total; };
-    var start = 'translateX(0)', end = 'translateX(' + (-over) + 'px)';
-    marquee = text.animate([
-      { transform: start, opacity: 0, offset: 0 },
-      { transform: start, opacity: 1, offset: at(fade) },
-      { transform: start, opacity: 1, offset: at(wait) },
-      { transform: end, opacity: 1, offset: at(wait + move) },
-      { transform: end, opacity: 1, offset: at(wait + move + hold) },
-      { transform: end, opacity: 0, offset: 1 }
-    ], { duration: total, iterations: Infinity, easing: 'linear' });
+    var box = el.pStatus.querySelector('.p-scroll'), track = box && box.firstChild;
+    if (!box || !track) return;
+    var first = track.firstChild;
+    while (track.childNodes.length > 1) track.removeChild(track.lastChild); // drop an old copy
+    var textWidth = first.getBoundingClientRect().width;
+    var long = textWidth - box.clientWidth > 1;
+    box.classList.toggle('is-long', long);
+    if (!long || !track.animate || (reduceMotion && reduceMotion.matches)) return;
+    // A second copy follows the first, so the loop has no jump.
+    var copy = first.cloneNode(true);
+    copy.setAttribute('aria-hidden', 'true');
+    copy.style.marginLeft = MARQUEE_GAP + 'px';
+    track.appendChild(copy);
+    var lap = textWidth + MARQUEE_GAP;
+    marquee = track.animate(
+      [{ transform: 'translateX(0)' }, { transform: 'translateX(' + (-lap) + 'px)' }],
+      { duration: lap / 30 * 1000, delay: 3000, iterations: Infinity, easing: 'linear' }
+    );
   }
   window.addEventListener('resize', syncMarquee);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncMarquee);
