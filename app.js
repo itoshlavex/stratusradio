@@ -318,6 +318,7 @@
     var over = text.scrollWidth - box.clientWidth;
     box.classList.toggle('is-long', over > 1);
     if (over <= 1 || !text.animate || (reduceMotion && reduceMotion.matches)) return;
+    over += 20; // carry the last word clear of the fade at the right edge
     var fade = 300, wait = 3000, move = over / 30 * 1000, hold = 2000;
     var total = wait + move + hold + fade, at = function (ms) { return ms / total; };
     var start = 'translateX(0)', end = 'translateX(' + (-over) + 'px)';
@@ -597,6 +598,7 @@
     }).join(' ');
   }
   function prettyTitle(text) {
+    text = text.replace(/\s*(\[\s*\]|\(\s*\))\s*/g, ' ').trim(); // empty brackets: "feat [] Lady Saw"
     return text.replace(/,(?=[^\s\d])/g, ', ').split(/\s+[-–—]\s+/).map(fromCapitals).join(' · ');
   }
 
