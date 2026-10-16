@@ -785,8 +785,7 @@
   var THEME_NAME = { auto: 'Same as phone', light: 'Light mode', dark: 'Dark mode' };
   var theme = store.get('theme', 'auto');
   if (THEMES.indexOf(theme) < 0) theme = 'auto';
-  var themeBtn = $('#theme-btn'), tagline = $('#tagline'), themeMeta = document.querySelector('meta[name="theme-color"]');
-  var taglineText = tagline.textContent, taglineTimer = 0;
+  var themeBtn = $('#theme-btn'), themeMeta = document.querySelector('meta[name="theme-color"]');
 
   function applyTheme() {
     var root = document.documentElement;
@@ -802,10 +801,6 @@
     theme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
     store.set('theme', theme);
     applyTheme();
-    // Say which mode is on for a moment, in place of the tagline.
-    tagline.textContent = 'Theme: ' + THEME_NAME[theme];
-    clearTimeout(taglineTimer);
-    taglineTimer = setTimeout(function () { tagline.textContent = taglineText; }, 1800);
   });
   if (window.matchMedia) {
     var darkQuery = matchMedia('(prefers-color-scheme: dark)');
