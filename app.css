@@ -372,6 +372,10 @@ button { font: inherit; color: inherit; }
 .p-scroll-t { flex: none; }
 .p-scroll.is-long {
   width: calc(100% - 13px);
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 16px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 16px), transparent);
+}
+.p-scroll.is-long.is-moving {
   -webkit-mask-image: linear-gradient(to right, transparent, #000 10px, #000 calc(100% - 16px), transparent);
   mask-image: linear-gradient(to right, transparent, #000 10px, #000 calc(100% - 16px), transparent);
 }

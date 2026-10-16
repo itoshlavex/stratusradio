@@ -330,16 +330,17 @@
     copy.style.marginLeft = MARQUEE_GAP + 'px';
     track.appendChild(copy);
     var lap = textWidth + MARQUEE_GAP;
-    function run(delay, then) {
+    function run() {
+      box.classList.add('is-moving'); // fade the left edge only while text slides out there
       marquee = track.animate(
         [{ transform: 'translateX(0)' }, { transform: 'translateX(' + (-lap) + 'px)' }],
-        { duration: lap / 30 * 1000, delay: delay, easing: 'linear' }
+        { duration: lap / 30 * 1000, easing: 'linear' }
       );
       // A lap ends with the copy exactly where the start was, so stopping shows the start.
-      if (then) marquee.onfinish = then;
+      marquee.onfinish = function () { box.classList.remove('is-moving'); marquee = null; rest(30000); };
     }
-    function rest() { marqueeTimer = setTimeout(function () { run(0, rest); }, 30000); }
-    run(3000, rest);
+    function rest(ms) { marqueeTimer = setTimeout(run, ms); }
+    rest(3000);
   }
   window.addEventListener('resize', syncMarquee);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncMarquee);
