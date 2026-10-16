@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Stratus Radio</title>
+<meta name="description" content="Listen to Papua New Guinea radio stations online: Yumi FM, Legend FM, Nau FM, FM100, NBC and more.">
+<meta name="theme-color" content="#021A4F">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Stratus Radio">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <img class="logo" src="logo.png" width="64" height="64" alt="">
+    <div class="brand">
+      <h1 class="wordmark" aria-label="Stratus Radio"><span class="w1">stratus</span><span class="w2">radio</span></h1>
+      <p class="tagline">Harim redio bilong PNG</p>
+    </div>
+    <p class="clock" title="Time in Papua New Guinea">
+      <span class="clock-label">PNG time</span>
+      <span class="clock-time" id="clock-time">--:--</span>
+    </p>
+  </div>
+  <svg class="wave" viewBox="0 0 1440 48" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <path class="wave-back" d="M0,0H1440V30C1140,48 900,12 600,26C360,37 160,42 0,28Z"/>
+    <path class="wave-front" d="M0,0H1440V14C1180,34 920,2 640,13C380,23 180,30 0,14Z"/>
+  </svg>
+</header>
+
+<main class="wrap" id="main">
+  <div class="tools">
+    <label class="search" for="q">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+      <input id="q" type="search" placeholder="Search stations, towns, languages" autocomplete="off" enterkeyhint="search">
+      <span class="visually-hidden">Search stations</span>
+    </label>
+    <div class="chips" id="chips" role="group" aria-label="Filter stations"></div>
+  </div>
+
+  <p class="count" id="count" aria-live="polite"></p>
+  <ul class="list" id="list"></ul>
+
+  <div class="empty" id="empty" hidden>
+    <p class="empty-title" id="empty-title">No stations match</p>
+    <p class="empty-body" id="empty-body">Try another word, or clear the search.</p>
+  </div>
+
+  <section class="about" aria-labelledby="about-h">
+    <h2 id="about-h" class="about-h">Good to know</h2>
+    <ul class="notes">
+      <li>Streaming uses about 30 to 60&nbsp;MB of data an hour, so use Wi-Fi if your data is limited.</li>
+      <li>Stations sometimes drop off air during power cuts or overnight. Stratus keeps trying to reconnect for a couple of minutes.</li>
+      <li>Lock-screen controls: skip back and forward to change station.</li>
+      <li id="dir-status">Looking for more PNG stations in the Radio Browser directory&hellip;</li>
+    </ul>
+    <div class="install" id="install" hidden>
+      <button class="btn-outline" id="install-btn" type="button">Install Stratus Radio on this phone</button>
+    </div>
+    <p class="install-ios" id="install-ios" hidden>To install on iPhone: tap <strong>Share</strong>, then <strong>Add to Home Screen</strong>.</p>
+  </section>
+</main>
+
+<div class="player" id="player" role="region" aria-label="Player">
+  <div class="player-inner">
+    <span class="tile tile-sm" id="p-tile" aria-hidden="true"></span>
+    <div class="p-text">
+      <p class="p-name" id="p-name">Pick a station</p>
+      <p class="p-status" id="p-status" aria-live="polite">Tap any station to start listening</p>
+    </div>
+    <button class="icon-btn" id="sleep-btn" type="button" aria-label="Sleep timer" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      <span class="sleep-left" id="sleep-left" hidden></span>
+    </button>
+    <button class="play-btn" id="play-btn" type="button" aria-label="Play" disabled>
+      <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
+      <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>
+      <span class="spinner" aria-hidden="true"></span>
+    </button>
+  </div>
+  <p class="p-help" id="p-help" hidden></p>
+</div>
+
+<dialog class="sheet" id="sleep-sheet" aria-labelledby="sleep-h">
+  <form method="dialog" class="sheet-inner">
+    <h2 class="sheet-h" id="sleep-h">Sleep timer</h2>
+    <p class="sheet-sub" id="sleep-sub">Stop the radio after</p>
+    <div class="sleep-grid" id="sleep-grid">
+      <button type="button" data-min="15">15<small>min</small></button>
+      <button type="button" data-min="30">30<small>min</small></button>
+      <button type="button" data-min="45">45<small>min</small></button>
+      <button type="button" data-min="60">1<small>hour</small></button>
+      <button type="button" data-min="90">1&frac12;<small>hours</small></button>
+      <button type="button" data-min="120">2<small>hours</small></button>
+    </div>
+    <div class="sheet-actions">
+      <button type="button" class="btn-text" id="sleep-off" hidden>Turn off timer</button>
+      <button type="submit" class="btn-outline" value="close">Close</button>
+    </div>
+  </form>
+</dialog>
+
+<audio id="audio" preload="none"></audio>
+<script src="stations.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
