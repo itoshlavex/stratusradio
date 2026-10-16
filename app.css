@@ -363,6 +363,20 @@ button { font: inherit; color: inherit; }
   display: inline-block; width: 7px; height: 7px; border-radius: 50%;
   background: var(--live); margin-right: 6px; vertical-align: 1px;
 }
+/* Long song titles scroll inside this box (see syncMarquee in app.js) */
+.p-scroll {
+  display: inline-block; max-width: calc(100% - 13px); vertical-align: bottom;
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+.p-scroll-in { display: inline-block; }
+.p-scroll.is-long {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 6px, #000 calc(100% - 16px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 6px, #000 calc(100% - 16px), transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .p-scroll-in { display: inline; }
+  .p-scroll.is-long { -webkit-mask-image: none; mask-image: none; }
+}
 .p-status a { color: var(--player-fg); }
 .p-help {
   margin: -4px 0 0; padding: 0 16px 12px;

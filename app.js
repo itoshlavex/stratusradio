@@ -286,7 +286,11 @@
     switch (state) {
       case 'connecting': html = 'Connecting…'; break;
       case 'buffering': html = 'Weak signal, buffering…'; break;
-      case 'live': html = '<span class="live-dot"></span>' + (nowPlaying ? esc(nowPlaying) : 'Live' + (where ? ' · ' + esc(where) : '')); break;
+      case 'live':
+        html = '<span class="live-dot"></span>' + (nowPlaying
+          ? '<span class="p-scroll"><span class="p-scroll-in">' + esc(nowPlaying) + '</span></span>'
+          : 'Live' + (where ? ' · ' + esc(where) : ''));
+        break;
       case 'reconnecting': html = 'Signal dropped. Reconnecting (' + retries + ' of ' + MAX_RETRIES + ')…'; break;
       case 'paused': html = stoppedBySleep ? 'Stopped by the sleep timer' : 'Paused'; break;
       case 'offline': html = 'No internet. It will start again when you’re back online.'; break;
@@ -299,7 +303,35 @@
       default: html = 'Tap play to listen' + (where ? ' · ' + esc(where) : '');
     }
     el.pStatus.innerHTML = html;
+    syncMarquee();
   }
+
+  // A song title too long for the player scrolls slowly: it waits 3 s so the start can be
+  // read, moves at 30 px a second, holds 2 s at the end, fades and starts again.
+  // Phones set to reduce motion keep it still, ending in "…".
+  var marquee = null;
+  var reduceMotion = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+  function syncMarquee() {
+    if (marquee) { marquee.cancel(); marquee = null; }
+    var box = el.pStatus.querySelector('.p-scroll'), text = box && box.firstChild;
+    if (!box || !text) return;
+    var over = text.scrollWidth - box.clientWidth;
+    box.classList.toggle('is-long', over > 1);
+    if (over <= 1 || !text.animate || (reduceMotion && reduceMotion.matches)) return;
+    var fade = 300, wait = 3000, move = over / 30 * 1000, hold = 2000;
+    var total = wait + move + hold + fade, at = function (ms) { return ms / total; };
+    var start = 'translateX(0)', end = 'translateX(' + (-over) + 'px)';
+    marquee = text.animate([
+      { transform: start, opacity: 0, offset: 0 },
+      { transform: start, opacity: 1, offset: at(fade) },
+      { transform: start, opacity: 1, offset: at(wait) },
+      { transform: end, opacity: 1, offset: at(wait + move) },
+      { transform: end, opacity: 1, offset: at(wait + move + hold) },
+      { transform: end, opacity: 0, offset: 1 }
+    ], { duration: total, iterations: Infinity, easing: 'linear' });
+  }
+  window.addEventListener('resize', syncMarquee);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncMarquee);
 
   function clearTimers(keepNp) {
     clearTimeout(timers.retry); clearTimeout(timers.connect); clearTimeout(timers.stall); clearTimeout(timers.release);
