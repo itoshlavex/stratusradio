@@ -1,6 +1,6 @@
 /* Stratus Radio service worker: keeps the app itself available offline.
    Radio streams and live station lookups always go straight to the network. */
-var CACHE = 'stratus-v4';
+var CACHE = 'stratus-v5';
 var SHELL = [
   './',
   'index.html',
@@ -51,6 +51,8 @@ self.addEventListener('fetch', function (e) {
   if (url.origin !== self.location.origin) return;
   // Range requests are media; don't touch them.
   if (req.headers.has('range')) return;
+  // Live song lookups (worker.js) must never come from the cache.
+  if (url.pathname.indexOf('/api/') === 0) return;
 
   // The app's own files: use the network when possible so updates arrive, fall back to the cache.
   e.respondWith(

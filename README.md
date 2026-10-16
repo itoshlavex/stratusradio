@@ -12,6 +12,7 @@ Live radio from across the Pacific. Stratus Radio is a web app: it runs in any p
 - Keeps playing with the screen locked. Play, pause and change station from the lock screen or headphones.
 - Sleep timer: 15 minutes to 2 hours, or a custom time in hours and minutes, with a short fade-out.
 - Reconnects on its own when the signal drops.
+- Shows the song or programme on air, for stations that send it, in the player and on the lock screen.
 
 ## Where it lives
 
@@ -53,6 +54,7 @@ The stream addresses came from each station's own website or player where possib
 | `manifest.webmanifest` | Home-screen app name and colours |
 | `logo.png`, `icon-*.png`, `apple-touch-icon.png`, `favicon-32.png` | Stratus Radio logo and app icons |
 | `logos/` | Station logos, one square image per station, named after the station's `id` |
+| `worker.js` | Small Cloudflare helper behind `/api/now`: reads the song name a station sends inside its stream (browsers can't), so the app can show it |
 | `wrangler.jsonc` | Cloudflare hosting settings, including the `stratusradio.ololiohill.io` address |
 | `.assetsignore` | Files in the repo that Cloudflare keeps off the website |
 | `.gitignore` | Files Git leaves out of the repo |
