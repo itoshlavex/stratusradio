@@ -279,7 +279,21 @@ button { font: inherit; color: inherit; }
   color: var(--tile-fg, var(--tile-navy-fg));
   font-family: var(--display);
   line-height: 0.95;
+  position: relative;
 }
+/* Play/pause badge on the current station's tile: tapping the row plays or pauses it */
+.tile-badge {
+  display: none;
+  position: absolute; right: -5px; bottom: -5px;
+  width: 24px; height: 24px; border-radius: 50%;
+  place-items: center;
+  background: var(--accent); color: #FFFFFF;
+  box-shadow: 0 0 0 2px var(--bg);
+}
+.tile-badge svg { width: 12px; height: 12px; grid-area: 1 / 1; }
+.st.is-current .tile-badge { display: grid; }
+.tile-badge .b-pause, .st.is-active .tile-badge .b-play { display: none; }
+.st.is-active .tile-badge .b-pause { display: block; }
 .tile-freq { font-weight: 600; font-size: 1.3125rem; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
 .tile-freq.is-long { font-size: 1.125rem; }
 .tile-band { font-family: var(--body); font-weight: 700; font-size: 0.625rem; letter-spacing: 0.14em; margin-top: 3px; }
