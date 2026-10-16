@@ -427,9 +427,12 @@ button { font: inherit; color: inherit; }
   padding-left: var(--gutter-l); padding-right: var(--gutter-r);
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
 }
+.sheet-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.sheet-titles { flex: 1; min-width: 0; }
+.sheet-close { flex: none; padding: 7px 16px; font-size: 0.9375rem; border-color: var(--line); }
 .sheet-h { margin: 0; font: 600 var(--step-1)/1.25 var(--display); }
 .sheet-h:focus { outline: none; }
-.sheet-sub { margin: 2px 0 12px; font-size: var(--step--1); color: var(--muted); }
+.sheet-sub { margin: 2px 0 0; font-size: var(--step--1); color: var(--muted); }
 /* Time choices look like the filter chips */
 .sleep-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .sleep-grid button {
@@ -455,9 +458,7 @@ button { font: inherit; color: inherit; }
   background: var(--accent); color: var(--accent-ink); font: 700 0.9375rem/1.2 var(--body);
 }
 .btn-fill:disabled { opacity: 0.4; cursor: default; }
-.sheet-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; gap: 12px; }
-.sheet-actions .btn-outline { margin-left: auto; padding: 7px 16px; font-size: 0.9375rem; border-color: var(--line); }
-.sheet-actions .btn-text { font-size: 0.9375rem; }
+.sleep-off { display: block; margin: 10px 0 -6px; font-size: 0.9375rem; }
 
 /* Short message above the player, e.g. "Link copied" */
 .toast {
