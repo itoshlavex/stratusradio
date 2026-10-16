@@ -781,29 +781,34 @@
 
   /* ---------- Light / dark ---------- */
 
-  var THEMES = ['auto', 'light', 'dark'];
-  var THEME_NAME = { auto: 'Same as phone', light: 'Light mode', dark: 'Dark mode' };
+  // 'auto' follows the phone. Each tap flips what's on screen; landing back on the
+  // phone's own setting goes back to 'auto', so the phone takes over again.
   var theme = store.get('theme', 'auto');
-  if (THEMES.indexOf(theme) < 0) theme = 'auto';
+  if (theme !== 'light' && theme !== 'dark') theme = 'auto';
   var themeBtn = $('#theme-btn'), themeMeta = document.querySelector('meta[name="theme-color"]');
+  var darkQuery = window.matchMedia ? matchMedia('(prefers-color-scheme: dark)') : null;
+
+  function phoneTheme() { return darkQuery && darkQuery.matches ? 'dark' : 'light'; }
+  function shownTheme() { return theme === 'auto' ? phoneTheme() : theme; }
 
   function applyTheme() {
     var root = document.documentElement;
     if (theme === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', theme);
-    themeBtn.setAttribute('data-mode', theme);
-    themeBtn.setAttribute('aria-label', 'Theme: ' + THEME_NAME[theme].toLowerCase() + '. Tap to change.');
-    themeBtn.title = 'Theme: ' + THEME_NAME[theme];
+    var other = shownTheme() === 'dark' ? 'light' : 'dark';
+    themeBtn.setAttribute('data-mode', shownTheme());
+    themeBtn.setAttribute('aria-label', 'Switch to ' + other + ' mode');
+    themeBtn.title = 'Switch to ' + other + ' mode';
     // Match the phone's status bar to the header colour.
     var bg = getComputedStyle(root).getPropertyValue('--header-bg').trim();
     if (themeMeta && bg) themeMeta.setAttribute('content', bg);
   }
   themeBtn.addEventListener('click', function () {
-    theme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
+    var next = shownTheme() === 'dark' ? 'light' : 'dark';
+    theme = next === phoneTheme() ? 'auto' : next;
     store.set('theme', theme);
     applyTheme();
   });
-  if (window.matchMedia) {
-    var darkQuery = matchMedia('(prefers-color-scheme: dark)');
+  if (darkQuery) {
     var onScheme = function () { if (theme === 'auto') applyTheme(); };
     if (darkQuery.addEventListener) darkQuery.addEventListener('change', onScheme); else if (darkQuery.addListener) darkQuery.addListener(onScheme);
   }
