@@ -10,7 +10,7 @@ Live radio from across the Pacific. Stratus Radio is a web app: it runs in any p
 - Share a station: the paper-plane button beside each station sends a short link, like `https://stratusradio.ololiohill.io/yumi-fm`, that opens Stratus Radio with that station ready to play. The part after the `/` is the station's `id` in `stations.js`.
 - Light and dark mode: follows the phone, or tap the button in the header to switch.
 - Keeps playing with the screen locked. Play, pause and change station from the lock screen or headphones.
-- Sleep timer: 15 minutes to 2 hours, with a short fade-out.
+- Sleep timer: 15 minutes to 2 hours, or a custom time in hours and minutes, with a short fade-out.
 - Reconnects on its own when the signal drops.
 
 ## Where it lives

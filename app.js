@@ -45,6 +45,7 @@
     player: $('#player'), pTile: $('#p-tile'), pName: $('#p-name'), pStatus: $('#p-status'), pHelp: $('#p-help'),
     playBtn: $('#play-btn'), sleepBtn: $('#sleep-btn'), sleepLeft: $('#sleep-left'), toast: $('#toast'),
     sheet: $('#sleep-sheet'), sleepGrid: $('#sleep-grid'), sleepSub: $('#sleep-sub'), sleepOff: $('#sleep-off'),
+    customBtn: $('#sleep-custom-btn'), custom: $('#sleep-custom'), customH: $('#custom-h'), customM: $('#custom-m'), customStart: $('#custom-start'),
     countries: $('#countries')
   };
   var audio = $('#audio');
@@ -714,10 +715,13 @@
 
   function renderSleep() {
     renderSleepBadge();
-    var btns = el.sleepGrid.querySelectorAll('button');
+    var btns = el.sleepGrid.querySelectorAll('button[data-min]'), preset = false;
     for (var i = 0; i < btns.length; i++) {
-      btns[i].setAttribute('aria-pressed', String(!!sleepEnd && Number(btns[i].getAttribute('data-min')) === sleepMin));
+      var on = !!sleepEnd && Number(btns[i].getAttribute('data-min')) === sleepMin;
+      if (on) preset = true;
+      btns[i].setAttribute('aria-pressed', String(on));
     }
+    el.customBtn.setAttribute('aria-pressed', String(!!sleepEnd && !preset));
     el.sleepOff.hidden = !sleepEnd;
     el.sleepSub.textContent = sleepEnd ? 'The radio stops at ' + clockAt(sleepEnd) + '. Pick a new time to change it.' : 'Stop the radio after';
   }
@@ -787,9 +791,36 @@
   el.sleepGrid.addEventListener('click', function (e) {
     var b = e.target.closest('button');
     if (!b) return;
+    if (b === el.customBtn) { showCustom(el.custom.hidden); return; }
     setSleep(Number(b.getAttribute('data-min')));
     closeSheet();
   });
+
+  // Custom sleep time: hours and minutes (phones show these as scroll wheels).
+  (function () {
+    var h = '', m = '';
+    for (var i = 0; i <= 12; i++) h += '<option value="' + i + '">' + i + '</option>';
+    for (var j = 0; j < 60; j++) m += '<option value="' + j + '">' + (j < 10 ? '0' : '') + j + '</option>';
+    el.customH.innerHTML = h; el.customM.innerHTML = m;
+    var last = store.get('customSleep', 150);
+    el.customH.value = String(Math.floor(last / 60)); el.customM.value = String(last % 60);
+  })();
+  function customMinutes() { return Number(el.customH.value) * 60 + Number(el.customM.value); }
+  function showCustom(on) {
+    el.custom.hidden = !on;
+    el.customBtn.setAttribute('aria-expanded', String(on));
+  }
+  function syncCustomStart() { el.customStart.disabled = customMinutes() < 1; }
+  el.customH.addEventListener('change', syncCustomStart);
+  el.customM.addEventListener('change', syncCustomStart);
+  el.customStart.addEventListener('click', function () {
+    var min = customMinutes();
+    if (min < 1) return;
+    store.set('customSleep', min);
+    setSleep(min);
+    closeSheet();
+  });
+  el.sheet.addEventListener('close', function () { showCustom(false); });
   el.sleepOff.addEventListener('click', function () { setSleep(0); closeSheet(); });
   el.sheet.addEventListener('click', function (e) { if (e.target === el.sheet) closeSheet(); });
 

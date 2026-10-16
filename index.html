@@ -101,8 +101,13 @@
       <button type="button" data-min="30">30<small>min</small></button>
       <button type="button" data-min="45">45<small>min</small></button>
       <button type="button" data-min="60">1<small>hour</small></button>
-      <button type="button" data-min="90">1&frac12;<small>hours</small></button>
       <button type="button" data-min="120">2<small>hours</small></button>
+      <button type="button" id="sleep-custom-btn" aria-expanded="false" aria-controls="sleep-custom">Custom</button>
+    </div>
+    <div class="sleep-custom" id="sleep-custom" hidden>
+      <label class="sleep-pick"><select id="custom-h" aria-label="Hours"></select><span>hours</span></label>
+      <label class="sleep-pick"><select id="custom-m" aria-label="Minutes"></select><span>min</span></label>
+      <button type="button" class="btn-fill" id="custom-start">Start</button>
     </div>
     <div class="sheet-actions">
       <button type="button" class="btn-text" id="sleep-off" hidden>Turn off timer</button>
