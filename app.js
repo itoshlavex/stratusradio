@@ -119,9 +119,6 @@
     return '<span class="tile-short">' + esc(st.short || initials(st.name)) + '</span>';
   }
   var SHARE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5 10 14M20.5 3.5 14 20.5l-4-6.5-6.5-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>';
-  // Play/pause badge, shown only on the current station's tile.
-  var BADGE = '<span class="tile-badge"><svg class="b-play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>' +
-    '<svg class="b-pause" viewBox="0 0 24 24"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg></span>';
   var STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
 
   function rowHTML(st) {
@@ -130,7 +127,7 @@
     var meta = [st.lang, places].filter(Boolean).join(' · ');
     return '<li class="st" data-id="' + esc(st.id) + '">' +
       '<button class="st-main" type="button" aria-label="Play ' + esc(st.name) + '">' +
-        '<span class="tile t-' + esc(st.tile) + '" aria-hidden="true">' + tileHTML(st) + BADGE + '</span>' +
+        '<span class="tile t-' + esc(st.tile) + '" aria-hidden="true">' + tileHTML(st) + '</span>' +
         '<span class="st-text">' +
           '<span class="st-name">' + esc(st.name) + '</span>' +
           (meta ? '<span class="st-meta">' + esc(meta) + '</span>' : '') +
@@ -208,12 +205,8 @@
     var rows = el.list.querySelectorAll('.st');
     for (var i = 0; i < rows.length; i++) {
       var isCur = !!current && rows[i].getAttribute('data-id') === current.id;
-      var on = isCur && isActive();
       rows[i].classList.toggle('is-current', isCur);
-      rows[i].classList.toggle('is-active', on);
       rows[i].classList.toggle('is-live', isCur && state === 'live');
-      var btn = rows[i].querySelector('.st-main'), name = rows[i].querySelector('.st-name').textContent;
-      btn.setAttribute('aria-label', (on ? 'Pause ' : 'Play ') + name);
     }
   }
 
