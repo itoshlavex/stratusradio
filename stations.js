@@ -70,6 +70,25 @@ window.STRATUS_STATIONS = [
     match: ['nbc national', 'karai', 'national broadcasting'], homepage: 'https://www.nbc.com.pg/listen'
   },
   {
+    id: 'hope-radio-png', country: 'PG',
+    name: 'Adventist Hope Radio', freq: '107.5 FM',
+    city: 'Lae',
+    desc: 'Seventh-day Adventist radio: gospel music, talk and Bible programmes',
+    cats: ['christian'], tile: 'bright',
+    stream: ['https://servidor30-3.brlogic.com:7020/live'],
+    match: ['hope radio', 'hope fm'], homepage: 'https://www.facebook.com/adventisthoperadiopng'
+  },
+  {
+    id: 'wantok-light', country: 'PG',
+    name: 'Wantok Radio Light', freq: '93.9 FM',
+    city: 'Port Moresby', also: '105.9 FM network, shortwave 7325 kHz',
+    lang: 'Tok Pisin, English', desc: 'Christian radio: “Your Inspiration Station”',
+    cats: ['christian'], tile: 'ice',
+    resolve: { type: 'azuracast', api: 'https://radio.kinect.com.pg/api/nowplaying/wrl' },
+    stream: ['https://radio.kinect.com.pg/listen/wrl/radio.mp3'],
+    match: ['wantok'], homepage: 'https://www.wantokradio.org/'
+  },
+  {
     id: 'radio-maria-png', country: 'PG',
     name: 'Radio Maria PNG', freq: '103.5 FM',
     city: 'Port Moresby', also: 'Wewak, Lae, Mt Hagen, Mendi, Kimbe',
@@ -136,6 +155,62 @@ window.STRATUS_STATIONS = [
     cats: ['music'], tile: 'ice',
     stream: ['https://stream.rcs.revma.com/8a38ru8a303vv'],
     match: ['sargam'], homepage: 'https://www.fijivillage.com/stream/radiosargam/'
+  },
+  {
+    id: 'radio-fiji-one', country: 'FJ',
+    name: 'Radio Fiji One', freq: '', short: 'RF1',
+    city: 'Suva', lang: 'iTaukei (Fijian)', desc: 'FBC’s iTaukei station: news, talk and music',
+    cats: ['news', 'music'], tile: 'navy',
+    stream: ['https://icecast1.sere.plus/RFOne'],
+    match: ['radio fiji one', 'rf1'], homepage: 'https://www.fbcnews.com.fj/'
+  },
+  {
+    id: 'bula-fm', country: 'FJ',
+    name: 'Bula FM', freq: '', short: 'BULA',
+    city: 'Suva', lang: 'iTaukei (Fijian)', desc: 'Fijian music and entertainment from FBC',
+    cats: ['music'], tile: 'sky',
+    stream: ['https://icecast1.sere.plus/Bula'],
+    match: ['bula'], homepage: 'https://www.fbcnews.com.fj/'
+  },
+  {
+    id: 'radio-fiji-two', country: 'FJ',
+    name: 'Radio Fiji Two', freq: '', short: 'RF2',
+    city: 'Suva', lang: 'Fiji Hindi', desc: 'FBC’s Hindi station: news, talk and music',
+    cats: ['news', 'music'], tile: 'deep',
+    stream: ['https://icecast1.sere.plus/RFTwo'],
+    match: ['radio fiji two', 'rf2'], homepage: 'https://www.fbcnews.com.fj/'
+  },
+  {
+    id: 'mirchi-fm', country: 'FJ',
+    name: 'Mirchi FM', freq: '', short: 'MIR',
+    city: 'Suva', lang: 'Fiji Hindi', desc: 'Bollywood and Fiji Hindi hits from FBC',
+    cats: ['music'], tile: 'bright',
+    stream: ['https://icecast1.sere.plus/MirchiFiji'],
+    match: ['mirchi'], homepage: 'https://www.fbcnews.com.fj/'
+  },
+  {
+    id: 'gold-fm-fiji', country: 'FJ',
+    name: 'Gold FM', freq: '', short: 'GOLD',
+    city: 'Suva', lang: 'English', desc: 'FBC News, talk and classic hits',
+    cats: ['news', 'music'], tile: 'royal',
+    stream: ['https://icecast1.sere.plus/Gold'],
+    match: ['gold fm'], homepage: 'https://www.fbcnews.com.fj/'
+  },
+  {
+    id: '2day-fm-fiji', country: 'FJ',
+    name: '2Day FM', freq: '', short: '2DAY',
+    city: 'Suva', lang: 'English', desc: 'Today’s hits from FBC',
+    cats: ['music'], tile: 'ice',
+    stream: ['https://icecast1.sere.plus/2Day'],
+    match: ['2day'], homepage: 'https://www.fbcnews.com.fj/'
+  },
+  {
+    id: 'life-fm-fiji', country: 'FJ',
+    name: 'Life FM', freq: '', short: 'LIFE',
+    city: '', desc: 'Christian music and programmes',
+    cats: ['christian', 'music'], tile: 'navy',
+    stream: ['https://stream.rcast.net/65809'],
+    match: ['life fm'], homepage: ''
   },
 
   /* ---------- Vanuatu ---------- */
