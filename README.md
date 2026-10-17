@@ -43,6 +43,17 @@ Stations are listed in `stations.js`. Copy a block, give it a new `id`, and past
 
 The stream addresses came from each station's own website or player where possible. The address must start with `https://`, because the app is served over HTTPS and phones block plain `http://` streams on it. Stations change their stream addresses from time to time, so if one stops working, check its website for a new player.
 
+## The Android app
+
+`download/stratusradio.apk`, served at https://stratusradio.ololiohill.io/download/stratusradio.apk. Package `io.ololiohill.stratusradio`, Android 7.0 and newer. Android phones see an Android icon beside the company name at the bottom of the page; iPhones and computers don't, since they can't install it.
+
+- **It opens the live site in the phone's Chrome**, full screen with no address bar (a Trusted Web Activity, built on Google's Android Browser Helper). Chrome does the playing, so the radio keeps going with the screen off and has play/pause on the lock screen. Changes to the site reach the app straight away: rebuild the APK only for a new icon, name or version.
+- **Chrome hides the address bar only because** `.well-known/assetlinks.json` lists the app's package and signing certificate. Don't remove or change that file.
+- **Release it from the Actions tab:** run the **APK** workflow and type a version, like `1.0.1`. It builds, signs, checks the certificate against `assetlinks.json`, counts `versionCode` up and commits the new APK to `main`, and Cloudflare publishes it.
+- **The signing key** is in two Actions secrets, `ANDROID_KEYSTORE_BASE64` and `ANDROID_KEYSTORE_PASSWORD`, and in the owner's own backup. It is never in the repo. Android installs an update only if it is signed with the same key, so if the key is lost, everyone has to uninstall the app before they can get a newer one.
+- **The certificate** (SHA-256) is `ED:B0:49:10:CB:DF:3F:CD:4A:89:D0:EC:D4:86:69:BB:8E:06:EF:D9:C2:6F:A8:18:11:E1:09:55:89:45:3E:C6`, `CN=Stratus Radio, O=Ololio Hill Technologies`.
+- Shipped: 1.0 / versionCode 1 (17 October 2026).
+
 ## Files
 
 | File | What it does |
@@ -55,9 +66,12 @@ The stream addresses came from each station's own website or player where possib
 | `manifest.webmanifest` | Home-screen app name and colours |
 | `logo.png`, `icon-*.png`, `apple-touch-icon.png`, `favicon-32.png` | Stratus Radio logo and app icons |
 | `og-image.jpg` | The picture shown when the app's link is shared in WhatsApp, Facebook and other apps |
+| `android/` | The Android app (see above) |
+| `download/stratusradio.apk` | The built Android app |
+| `.well-known/assetlinks.json` | Tells Chrome the Android app belongs to this site |
 | `_headers` | Tells Cloudflare phones may keep the station logos for a long time |
 | `logos/` | Station logos, one square image per station, named after the station's `id` |
 | `worker.js` | Small Cloudflare helper behind `/api/now`: reads the song name a station sends inside its stream (browsers can't), so the app can show it |
 | `wrangler.jsonc` | Cloudflare hosting settings, including the `stratusradio.ololiohill.io` address |
-| `.assetsignore` | Files in the repo that Cloudflare keeps off the website |
+| `.assetsignore` | Files in the repo that Cloudflare keeps off the website (including `android/`) |
 | `.gitignore` | Files Git leaves out of the repo |

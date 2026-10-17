@@ -55,6 +55,8 @@ self.addEventListener('fetch', function (e) {
   if (req.headers.has('range')) return;
   // Live song lookups (worker.js) must never come from the cache.
   if (url.pathname.indexOf('/api/') === 0) return;
+  // The Android app download is replaced in place each release; never keep a copy.
+  if (url.pathname.indexOf('/download/') === 0) return;
 
   // Station logos: once loaded, always shown from the phone's copy. Their addresses carry a
   // version (logos/<id>.webp?v=N), so a replaced logo has a new address and is fetched fresh.

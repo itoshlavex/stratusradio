@@ -348,6 +348,14 @@ button { font: inherit; color: inherit; }
   font-size: var(--step--1); color: var(--muted);
 }
 .credit a { color: inherit; text-decoration: none; }
+/* Android icon beside the credit: downloads the Android app */
+.credit .get-app {
+  display: inline-grid; place-items: center; vertical-align: middle;
+  width: 36px; height: 36px; margin: -8px 0 -8px 4px;
+  color: #1E9E5A; /* Android green, darkened to stand out on the light background */
+}
+.credit .get-app[hidden] { display: none; }
+.get-app svg { width: 22px; height: 22px; }
 
 /* Buttons */
 .btn-outline {

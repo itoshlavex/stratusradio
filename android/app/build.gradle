@@ -1,0 +1,77 @@
+/*
+  Stratus Radio for Android: a Trusted Web Activity.
+
+  The app opens https://stratusradio.ololiohill.io in the phone's Chrome, full
+  screen with no address bar, rather than carrying its own copy of the site. A
+  deploy reaches installed phones straight away; rebuild the APK only for the
+  icon, the name or a new version.
+
+  Chrome does the playing, so the radio keeps going with the screen off and has
+  play/pause on the lock screen, as the site does in Chrome. (An app built on
+  Android's WebView, like RollCall's, gets neither without a lot of extra code.)
+*/
+plugins {
+    id 'com.android.application'
+}
+
+// The signing key is never in the repo. The APK workflow writes a
+// keystore.properties on the runner from the repository's secrets and points
+// STRATUS_KEYSTORE_PROPERTIES at it (storeFile, storePassword, keyAlias, keyPassword).
+def keystoreProps = new Properties()
+def keystorePath = System.getenv('STRATUS_KEYSTORE_PROPERTIES')
+if (keystorePath && file(keystorePath).exists()) {
+    file(keystorePath).withInputStream { keystoreProps.load(it) }
+}
+
+android {
+    namespace 'io.ololiohill.stratusradio'
+    compileSdk 36
+
+    defaultConfig {
+        // Permanent: Android knows the app by this id. Changing it makes the next
+        // APK a different app that everyone would have to install separately.
+        applicationId 'io.ololiohill.stratusradio'
+        // Android 7.0, the floor of the Android Browser Helper library (and RollCall's too).
+        minSdk 24
+        targetSdk 36
+        versionCode 1
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        release {
+            if (keystoreProps.storeFile) {
+                storeFile file(keystoreProps.storeFile)
+                storePassword keystoreProps.storePassword
+                keyAlias keystoreProps.keyAlias
+                keyPassword keystoreProps.keyPassword
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.7.4'
+}
+
+// Without the key, gradle would quietly write an unsigned APK that no phone installs.
+gradle.taskGraph.whenReady { graph ->
+    if (graph.allTasks.any { it.path == ':app:assembleRelease' } && !keystoreProps.storeFile) {
+        throw new GradleException('No signing key. Build the APK with the APK workflow on GitHub, ' +
+            'or set STRATUS_KEYSTORE_PROPERTIES to a keystore.properties file.')
+    }
+}

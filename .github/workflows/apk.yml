@@ -1,0 +1,124 @@
+name: APK
+
+# Builds and signs the Android app, then puts it where the site serves it
+# (https://stratusradio.ololiohill.io/download/stratusradio.apk).
+#
+# Run from the Actions tab. Nothing here happens on a push: the app opens the
+# live site, so a change to the stations or the player reaches installed phones
+# through a normal deploy. Only the icon, the name or a new version is a reason
+# to build a new APK.
+#
+# The signing key lives in the repository's Actions secrets, never in the repo:
+# Android takes an update only if it carries the same signature as the build
+# already on the phone, so the key cannot be replaced.
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: "Version people see, e.g. 1.0.1"
+        required: true
+        type: string
+
+concurrency:
+  group: apk-main
+  cancel-in-progress: false
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    permissions:
+      # Commits the built APK back to main; Cloudflare deploys it from there.
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Restore the signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "ANDROID_KEYSTORE_BASE64 is not set - an unsigned APK installs nowhere." >&2
+            exit 1
+          fi
+          mkdir -p "$RUNNER_TEMP/keys"
+          printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/keys/stratusradio-release.jks"
+          # Written on the runner, never committed. android/app/build.gradle
+          # reads the path out of this variable.
+          {
+            echo "storeFile=$RUNNER_TEMP/keys/stratusradio-release.jks"
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyAlias=stratusradio"
+            echo "keyPassword=$KEYSTORE_PASSWORD"
+          } > "$RUNNER_TEMP/keys/keystore.properties"
+          echo "STRATUS_KEYSTORE_PROPERTIES=$RUNNER_TEMP/keys/keystore.properties" >> "$GITHUB_ENV"
+
+      - name: Set the version
+        # The input goes through the environment rather than straight into the
+        # script, so a version string cannot become a shell command.
+        env:
+          VERSION_NAME: ${{ inputs.version_name }}
+        run: |
+          current=$(grep -oP 'versionCode \K\d+' android/app/build.gradle)
+          next=$((current + 1))
+          # Android refuses an update whose versionCode is not higher than the
+          # installed one, so it counts up here rather than by hand.
+          sed -i "s/versionCode $current/versionCode $next/" android/app/build.gradle
+          sed -i "s/versionName \"[^\"]*\"/versionName \"$VERSION_NAME\"/" android/app/build.gradle
+          echo "APK_VERSION_CODE=$next" >> "$GITHUB_ENV"
+          echo "Building $VERSION_NAME, versionCode $next."
+
+      - name: Build
+        working-directory: android
+        run: |
+          ./gradlew --no-daemon assembleRelease
+          cp app/build/outputs/apk/release/app-release.apk ../download/stratusradio.apk
+
+      - name: Check it is signed with the Stratus Radio key
+        # The certificate must be the one the site lists in assetlinks.json, or
+        # Chrome shows an address bar over the app and phones refuse the update.
+        run: |
+          apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$apksigner" verify --print-certs download/stratusradio.apk | tee certs.txt
+          got=$(grep -oP 'SHA-256 digest: \K[0-9a-f]+' certs.txt | head -1)
+          want=$(grep -oP '"sha256_cert_fingerprints": \["\K[0-9A-F:]+' .well-known/assetlinks.json | tr -d ':' | tr 'A-F' 'a-f')
+          if [ "$got" != "$want" ]; then
+            echo "Signed with $got, but assetlinks.json lists $want." >&2
+            exit 1
+          fi
+
+      # Kept on the run as well as committed, so it can be downloaded straight away.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stratusradio-apk
+          path: download/stratusradio.apk
+
+      - name: Commit it
+        env:
+          VERSION_NAME: ${{ inputs.version_name }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add android/app/build.gradle download/stratusradio.apk
+          git commit -m "Build Stratus Radio $VERSION_NAME for Android" \
+            -m "versionCode $APK_VERSION_CODE, built and signed by the APK workflow."
+          git push
+
+      - name: Summary
+        env:
+          VERSION_NAME: ${{ inputs.version_name }}
+        run: |
+          {
+            echo "### Stratus Radio $VERSION_NAME built"
+            echo
+            echo "versionCode $APK_VERSION_CODE, committed to \`main\`. Cloudflare deploys it from there."
+            echo
+            echo "It will be at https://stratusradio.ololiohill.io/download/stratusradio.apk in a minute or two."
+          } >> "$GITHUB_STEP_SUMMARY"
