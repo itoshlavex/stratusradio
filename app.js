@@ -116,10 +116,13 @@
 
   // Station logos live in logos/<id>.webp (set logo: false in stations.js to skip one).
   // If a logo fails to load, the tile falls back to its frequency or letters.
+  // Phones keep logos for a long time; after replacing a logo file, raise LOGO_VERSION so
+  // everyone gets the new one.
+  var LOGO_VERSION = 1;
   var noLogo = new Set();
   function logoOf(st) {
     if (st.logo === false || noLogo.has(st.id)) return '';
-    return st.logo || 'logos/' + st.id + '.webp';
+    return (st.logo || 'logos/' + st.id + '.webp') + '?v=' + LOGO_VERSION;
   }
   function tileClass(st, extra) {
     return 'tile ' + (extra ? extra + ' ' : '') + 't-' + st.tile + (logoOf(st) ? ' has-logo' : '');
