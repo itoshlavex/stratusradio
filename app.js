@@ -29,7 +29,7 @@
     ['TK', 'Tokelau', 'Tokelau'], ['TV', 'Tuvalu', 'Tuvalu'], ['KI', 'Kiribati', 'Kiribati'], ['NR', 'Nauru', 'Nauru'],
     ['MH', 'Marshall Is.', 'Marshall Islands'], ['FM', 'Micronesia', 'Micronesia'], ['PW', 'Palau', 'Palau'],
     ['GU', 'Guam', 'Guam'], ['MP', 'N. Marianas', 'Northern Mariana Islands'],
-    ['NZ', 'New Zealand', 'NZ'], ['XP', 'Pacific-wide', '']
+    ['NZ', 'New Zealand', 'NZ'], ['AU', 'Australia', 'Australia'], ['XP', 'Pacific-wide', '']
   ];
   var COUNTRY = {};
   COUNTRIES.forEach(function (c, i) { COUNTRY[c[0]] = { code: c[0], label: c[1], place: c[2], order: i }; });
@@ -616,6 +616,18 @@
     setNowPlaying(st, text);
   }
 
+  // ABC music stations list the song on air ("now" is empty between songs).
+  // ABC Classic names the composer ("Schubert, Franz") rather than the performers.
+  function abcSong(data) {
+    var rec = data && data.now && data.now.recording;
+    if (!rec || !rec.title) return '';
+    var artists = rec.artists || [];
+    var composer = artists.filter(function (a) { return a.type === 'primaryComposer'; })[0];
+    var who = composer ? [composer.name.replace(/^([^,]+),\s*(.+?)(\s+(?:I{1,3}|IV|Jr\.?|Sr\.?))?$/, '$2 $1$3')]
+      : artists.filter(function (a) { return a.type === 'primary'; }).map(function (a) { return a.name; });
+    return who.length ? who.join(', ') + ' - ' + rec.title : rec.title;
+  }
+
   // Many stations send titles in capitals ("CHER - JUST LIKE JESSE JAMES").
   // Turn those into normal capitals and use a dot between the parts: "Cher · Just like Jesse James".
   var SMALL_WORDS = { a: 1, an: 1, the: 1, and: 1, but: 1, or: 1, nor: 1, as: 1, at: 1, by: 1, 'for': 1, 'in': 1, of: 1, on: 1, to: 1, vs: 1, via: 1, 'with': 1, from: 1, like: 1, feat: 1, ft: 1 };
@@ -663,6 +675,12 @@
     if (st.resolve && st.resolve.type === 'azuracast') {
       // The first answer came with the stream lookup; refresh from here on.
       poll = function () { fetchJSON(st.resolve.api, 7000).then(function (d) { applyNowPlaying(st, d); }).catch(function () {}); };
+    } else if (st.np && st.np.type === 'abc') {
+      poll = function () {
+        fetchJSON('https://music.abcradio.net.au/api/v1/plays/' + st.np.service + '/now.json', 7000)
+          .then(function (d) { setNowPlaying(st, abcSong(d)); }).catch(function () {});
+      };
+      poll();
     } else {
       var src = urls[goodIndex];
       if (!src || /\.m3u8(\?|$)/i.test(src) || nowApiFails >= 3) return;

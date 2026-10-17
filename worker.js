@@ -80,7 +80,8 @@ async function readStreamTitle(stream) {
         if (len === 0) { block++; pos += 1 + metaint; continue; }
         if (have < pos + 1 + len) break;
         const meta = new TextDecoder('utf-8').decode(buf.subarray(pos + 1, pos + 1 + len));
-        const m = /StreamTitle='(.*?)';/s.exec(meta);
+        // Usually StreamTitle='...'; but some servers leave off the closing ";".
+        const m = /StreamTitle='(.*?)'(?:;|\s*$)/s.exec(meta.replace(/\0+$/, ''));
         return m ? m[1] : '';
       }
       if (have > 2 * metaint + 8192) break;
@@ -107,6 +108,7 @@ function join(chunks, total) {
 // Clean up what stations send: entities, internal codes, empty " - ", doubled titles.
 function tidy(t) {
   if (!t) return '';
+  if (/^Asset (Spot|Stop)\b/i.test(t)) return ''; // ad and break markers (Southern Cross Austereo)
   t = t.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#0?39;|&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>');
   t = t.replace(/\s+/g, ' ').trim();
   t = t.replace(/\b[A-Z0-9]{2,}-\d{4}-\d{2}-\d{2}\b/g, '').replace(/\b[A-Z0-9]+_\d+\b/g, '');

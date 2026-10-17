@@ -4,7 +4,7 @@
   Each station:
     id       unique key (also used for favourites, so don't rename it)
     name     display name
-    country  two-letter country code: PG, FJ, SB, VU, NC, WS, TO, PF, WF, GU, NZ ...
+    country  two-letter country code: PG, FJ, SB, VU, NC, WS, TO, PF, WF, GU, NZ, AU ...
              (XP = Pacific-wide services). Names are listed in app.js under COUNTRIES.
     freq     dial position shown on the tile, e.g. "93.1 FM" (leave empty for online-only)
     short    letters shown on the tile when there is no frequency
@@ -16,6 +16,7 @@
     tile     tile colour: navy, royal, bright, sky, ice, deep
     stream   list of stream URLs, tried in order until one plays
     resolve  optional: look the stream up live (AzuraCast "now playing" API)
+    np       optional: where the station publishes the song on air (ABC stations)
     match    words used to spot the same station in the online directory
     homepage station website
 
@@ -772,6 +773,236 @@ window.STRATUS_STATIONS = [
     cats: ['music'], tile: 'royal',
     stream: ['https://icast1.streamcom.net/TahuFM'],
     homepage: 'https://tahufm.online/'
+  },
+
+  /* ---------- Pacific and First Nations stations in Australia ---------- */
+  {
+    id: 'radio-4mw', country: 'AU',
+    name: 'Radio 4MW', freq: '1260 AM',
+    city: 'Thursday Island', also: 'Torres Strait, Cape York and PNG’s Western Province',
+    lang: 'English, Torres Strait Creole, Kala Lagaw Ya, Meriam Mir',
+    desc: 'Torres Strait Islander radio: island music, news and language programmes',
+    cats: ['music', 'news'], tile: 'sky',
+    stream: ['https://firstnationsmedia.stream/8024/stream'],
+    match: ['4mw', 'tsima'], homepage: 'https://www.tsima4mw.org.au/'
+  },
+  {
+    id: 'sbs-radio-1', country: 'AU',
+    name: 'SBS Radio 1', freq: '', short: 'SBS',
+    city: 'Sydney', also: 'AM and FM across Australia',
+    lang: 'Many languages, including Samoan', desc: 'News and programmes in Australia’s many languages, including SBS Samoan',
+    cats: ['news'], tile: 'navy',
+    stream: ['https://sbs-ice.streamguys1.com/sbs1-sbs-web'],
+    homepage: 'https://www.sbs.com.au/audio'
+  },
+  {
+    id: '4eb', country: 'AU',
+    name: '4EB Global Radio', freq: '98.1 FM',
+    city: 'Brisbane',
+    lang: 'Many languages, including Samoan, Tongan and Fijian', desc: 'Community radio in over 50 languages, with Pacific community programmes',
+    cats: ['news', 'music'], tile: 'ice',
+    stream: ['https://playerservices.streamtheworld.com/api/livestream-redirect/4EBAAC.aac', 'https://playerservices.streamtheworld.com/api/livestream-redirect/4EB.mp3'],
+    homepage: 'https://www.4eb.org.au/'
+  },
+  {
+    id: 'koori-radio', country: 'AU',
+    name: 'Koori Radio', freq: '93.7 FM',
+    city: 'Sydney', lang: 'English', desc: 'First Nations music, news and culture',
+    cats: ['music', 'news'], tile: 'deep',
+    stream: ['https://playerservices.streamtheworld.com/api/livestream-redirect/2LNDAAC.aac', 'https://playerservices.streamtheworld.com/api/livestream-redirect/2LND.mp3'],
+    homepage: 'https://www.kooriradio.com/'
+  },
+  {
+    id: 'triple-a', country: 'AU',
+    name: 'Triple A', freq: '98.9 FM',
+    city: 'Brisbane', lang: 'English', desc: 'First Nations radio playing country music',
+    cats: ['music'], tile: 'royal',
+    stream: ['https://playerservices.streamtheworld.com/api/livestream-redirect/989FMAAC.aac', 'https://playerservices.streamtheworld.com/api/livestream-redirect/989FM.mp3'],
+    homepage: 'https://triplea.org.au/'
+  },
+
+  /* ---------- Australia ---------- */
+  // np: where ABC stations publish the song on air (music.abcradio.net.au).
+  {
+    id: 'triple-j', country: 'AU',
+    name: 'triple j', freq: '', short: 'JJJ',
+    city: 'Sydney', also: 'FM across Australia',
+    lang: 'English', desc: 'ABC youth radio: new music and Australian artists',
+    cats: ['music'], tile: 'bright',
+    stream: ['https://streaming.abc-cdn.net.au/audio/hls/triplejnsw.m3u8?source=web', 'https://abc.streamguys1.com/live/triplejnsw/icecast.audio'],
+    np: { type: 'abc', service: 'triplej' },
+    homepage: 'https://www.abc.net.au/triplej'
+  },
+  {
+    id: 'double-j', country: 'AU',
+    name: 'Double J', freq: '', short: 'JJ',
+    city: 'Sydney', also: 'Digital radio across Australia',
+    lang: 'English', desc: 'ABC music radio: alternative and classic, old and new',
+    cats: ['music'], tile: 'royal',
+    stream: ['https://streaming.abc-cdn.net.au/audio/hls/doublejnsw.m3u8?source=web', 'https://abc.streamguys1.com/live/doublejnsw/icecast.audio'],
+    np: { type: 'abc', service: 'doublej' },
+    homepage: 'https://www.abc.net.au/doublej'
+  },
+  {
+    id: 'abc-classic', country: 'AU',
+    name: 'ABC Classic', freq: '', short: 'CLS',
+    city: 'Sydney', also: 'FM across Australia',
+    lang: 'English', desc: 'Classical music',
+    cats: ['music'], tile: 'deep',
+    stream: ['https://streaming.abc-cdn.net.au/audio/hls/classicfmnsw.m3u8?source=web', 'https://abc.streamguys1.com/live/classicfmnsw/icecast.audio'],
+    np: { type: 'abc', service: 'classic' },
+    homepage: 'https://www.abc.net.au/listen/classic'
+  },
+  {
+    id: 'abc-jazz', country: 'AU',
+    name: 'ABC Jazz', freq: '', short: 'JAZZ',
+    city: 'Sydney', also: 'Digital radio across Australia',
+    lang: 'English', desc: 'Jazz around the clock',
+    cats: ['music'], tile: 'navy',
+    stream: ['https://streaming.abc-cdn.net.au/audio/hls/abcjazz.m3u8?source=web', 'https://abc.streamguys1.com/live/abcjazz/icecast.audio'],
+    np: { type: 'abc', service: 'jazz' },
+    homepage: 'https://www.abc.net.au/listen/jazz'
+  },
+  {
+    id: 'abc-country', country: 'AU',
+    name: 'ABC Country', freq: '', short: 'CTRY',
+    city: 'Sydney', also: 'Digital radio across Australia',
+    lang: 'English', desc: 'Country music, with plenty from Australia',
+    cats: ['music'], tile: 'ice',
+    stream: ['https://streaming.abc-cdn.net.au/audio/hls/abccountry.m3u8?source=web', 'https://abc.streamguys1.com/live/abccountry/icecast.audio'],
+    np: { type: 'abc', service: 'country' },
+    homepage: 'https://www.abc.net.au/listen/country'
+  },
+  {
+    id: 'abc-newsradio', country: 'AU',
+    name: 'ABC NewsRadio', freq: '', short: 'NEWS',
+    city: 'Sydney', also: 'AM and FM across Australia',
+    lang: 'English', desc: 'Rolling news, sport and federal parliament',
+    cats: ['news'], tile: 'navy',
+    stream: ['https://streaming.abc-cdn.net.au/audio/hls/newsradio.m3u8?source=web', 'https://abc.streamguys1.com/live/newsradio/icecast.audio'],
+    homepage: 'https://www.abc.net.au/listen/news'
+  },
+  {
+    id: 'abc-rn', country: 'AU',
+    name: 'ABC Radio National', freq: '', short: 'RN',
+    city: 'Sydney', also: 'AM and FM across Australia',
+    lang: 'English', desc: 'Ideas, science, the arts and current affairs',
+    cats: ['news'], tile: 'deep',
+    stream: ['https://streaming.abc-cdn.net.au/audio/hls/rnnsw.m3u8?source=web', 'https://abc.streamguys1.com/live/rnnsw/icecast.audio'],
+    homepage: 'https://www.abc.net.au/listen/radionational'
+  },
+  {
+    id: 'abc-sydney', country: 'AU',
+    name: 'ABC Radio Sydney', freq: '702 AM',
+    city: 'Sydney', lang: 'English', desc: 'Local news, talk and sport',
+    cats: ['news'], tile: 'sky',
+    stream: ['https://streaming.abc-cdn.net.au/audio/hls/localsydney.m3u8?source=web', 'https://abc.streamguys1.com/live/localsydney/icecast.audio'],
+    homepage: 'https://www.abc.net.au/sydney'
+  },
+  {
+    id: 'abc-melbourne', country: 'AU',
+    name: 'ABC Radio Melbourne', freq: '774 AM',
+    city: 'Melbourne', lang: 'English', desc: 'Local news, talk and sport',
+    cats: ['news'], tile: 'royal',
+    stream: ['https://streaming.abc-cdn.net.au/audio/hls/localmelbourne.m3u8?source=web', 'https://abc.streamguys1.com/live/localmelbourne/icecast.audio'],
+    homepage: 'https://www.abc.net.au/melbourne'
+  },
+  {
+    id: 'abc-brisbane', country: 'AU',
+    name: 'ABC Radio Brisbane', freq: '612 AM',
+    city: 'Brisbane', lang: 'English', desc: 'Local news, talk and sport',
+    cats: ['news'], tile: 'ice',
+    stream: ['https://streaming.abc-cdn.net.au/audio/hls/localbrisbane.m3u8?source=web', 'https://abc.streamguys1.com/live/localbrisbane/icecast.audio'],
+    homepage: 'https://www.abc.net.au/brisbane'
+  },
+  {
+    id: 'kiis-1065', country: 'AU',
+    name: 'KIIS 106.5', freq: '106.5 FM',
+    city: 'Sydney', lang: 'English', desc: 'Today’s hit music',
+    cats: ['music'], tile: 'bright',
+    stream: ['https://playerservices.streamtheworld.com/api/livestream-redirect/ARN_KIIS1065AAC.aac', 'https://playerservices.streamtheworld.com/api/livestream-redirect/ARN_KIIS1065.mp3'],
+    homepage: 'https://www.iheart.com/live/kiis-1065-6185/'
+  },
+  {
+    id: 'nova-969', country: 'AU',
+    name: 'Nova 96.9', freq: '96.9 FM',
+    city: 'Sydney', lang: 'English', desc: 'Hit music and entertainment',
+    cats: ['music'], tile: 'royal',
+    stream: ['https://playerservices.streamtheworld.com/api/livestream-redirect/NOVA_969_AAC48.aac'],
+    homepage: 'https://novafm.com.au/station/nova969'
+  },
+  {
+    id: '2day-fm', country: 'AU',
+    name: '2Day FM', freq: '104.1 FM',
+    city: 'Sydney', lang: 'English', desc: 'Hits and entertainment',
+    cats: ['music'], tile: 'sky',
+    stream: ['https://legacy.scahw.com.au/2day_128', 'https://legacy.scahw.com.au/2day_32'],
+    homepage: 'https://hit.listnr.com/sydney/'
+  },
+  {
+    id: 'triple-m-sydney', country: 'AU',
+    name: 'Triple M Sydney', freq: '104.9 FM',
+    city: 'Sydney', lang: 'English', desc: 'Rock music, footy and comedy',
+    cats: ['music'], tile: 'navy',
+    stream: ['https://legacy.scahw.com.au/2mmm_128', 'https://legacy.scahw.com.au/2mmm_32'],
+    homepage: 'https://triplem.listnr.com/sydney/'
+  },
+  {
+    id: 'smooth-953', country: 'AU',
+    name: 'smoothfm 95.3', freq: '95.3 FM',
+    city: 'Sydney', lang: 'English', desc: 'Relaxing favourites',
+    cats: ['music'], tile: 'ice',
+    stream: ['https://playerservices.streamtheworld.com/api/livestream-redirect/SMOOTH953_AAC48.aac'],
+    homepage: 'https://smooth.com.au/station/smoothfm953'
+  },
+  {
+    id: 'gold-1043', country: 'AU',
+    name: 'Gold 104.3', freq: '104.3 FM',
+    city: 'Melbourne', lang: 'English', desc: 'Classic hits from the 70s, 80s and 90s',
+    cats: ['music'], tile: 'deep',
+    stream: ['https://playerservices.streamtheworld.com/api/livestream-redirect/ARN_GOLD1043AAC.aac', 'https://playerservices.streamtheworld.com/api/livestream-redirect/ARN_GOLD1043.mp3'],
+    homepage: 'https://www.gold1043.com.au/'
+  },
+  {
+    id: 'fox-fm', country: 'AU',
+    name: 'Fox FM', freq: '101.9 FM',
+    city: 'Melbourne', lang: 'English', desc: 'Today’s hits',
+    cats: ['music'], tile: 'bright',
+    stream: ['https://legacy.scahw.com.au/3fox_128', 'https://legacy.scahw.com.au/3fox_32'],
+    homepage: 'https://hit.listnr.com/melbourne/'
+  },
+  {
+    id: 'b105', country: 'AU',
+    name: 'B105', freq: '105.3 FM',
+    city: 'Brisbane', lang: 'English', desc: 'Hit music',
+    cats: ['music'], tile: 'sky',
+    stream: ['https://legacy.scahw.com.au/4bbb_128', 'https://legacy.scahw.com.au/4bbb_32'],
+    homepage: 'https://hit.listnr.com/brisbane/'
+  },
+  {
+    id: 'hope-1032', country: 'AU',
+    name: 'Hope 103.2', freq: '103.2 FM',
+    city: 'Sydney', lang: 'English', desc: 'Christian radio: feel-good music, faith and family',
+    cats: ['christian', 'music'], tile: 'sky',
+    stream: ['https://playerservices.streamtheworld.com/api/livestream-redirect/2CBAAAC.aac', 'https://playerservices.streamtheworld.com/api/livestream-redirect/2CBA.mp3'],
+    homepage: 'https://hope1032.com.au/'
+  },
+  {
+    id: 'rise-965', country: 'AU',
+    name: 'Rise 96.5', freq: '96.5 FM',
+    city: 'Brisbane', lang: 'English', desc: 'Christian family radio: music, news and talk',
+    cats: ['christian', 'music'], tile: 'royal',
+    stream: ['https://stream1.cnmns.net/96five'],
+    match: ['96five'], homepage: 'https://rise965.com/'
+  },
+  {
+    id: 'vision-radio', country: 'AU',
+    name: 'Vision Christian Radio', freq: '', short: 'VIS',
+    city: 'Brisbane', also: 'FM network across Australia',
+    lang: 'English', desc: 'Christian music, teaching and prayer',
+    cats: ['christian'], tile: 'ice',
+    stream: ['https://streams2.vision.org.au/vision128.mp3', 'https://streams3.vision.org.au/vision128.mp3'],
+    homepage: 'https://vision.org.au/'
   },
 
   /* ---------- Pacific-wide services ---------- */
