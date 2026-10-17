@@ -195,9 +195,22 @@
     syncScrollHints(el.countries);
   }
 
+  // Station-type chips count what's in the selected country ("Music 8", "Christian 6").
+  function typeCounts() {
+    var pool = stations.filter(function (s) { return country === 'all' || s.country === country; });
+    var count = { all: pool.length, fav: pool.filter(function (s) { return favs.has(s.id); }).length };
+    CATS.forEach(function (c) {
+      if (c.id !== 'all' && c.id !== 'fav') count[c.id] = pool.filter(function (s) { return (s.cats || []).indexOf(c.id) >= 0; }).length;
+    });
+    return count;
+  }
   function renderChips() {
-    el.chips.innerHTML = CATS.map(function (c) {
-      var n = c.id === 'fav' && favs.size ? '<span class="n">' + favs.size + '</span>' : '';
+    var count = typeCounts();
+    el.chips.innerHTML = CATS.filter(function (c) {
+      // A type with no stations in this country is hidden (All and Favourites always show).
+      return c.id === 'all' || c.id === 'fav' || count[c.id] > 0 || c.id === filter;
+    }).map(function (c) {
+      var n = count[c.id] ? '<span class="n">' + count[c.id] + '</span>' : '';
       return '<button class="chip" type="button" data-cat="' + c.id + '" aria-pressed="' + (filter === c.id) + '">' + esc(c.label) + n + '</button>';
     }).join('');
     syncScrollHints(el.chips);
@@ -864,19 +877,26 @@
   el.chips.addEventListener('click', function (e) {
     var b = e.target.closest('.chip');
     if (!b) return;
-    filter = b.getAttribute('data-cat');
-    store.set('filter', filter);
-    renderChips();
-    renderList();
+    keepChipsPinned(function () {
+      filter = b.getAttribute('data-cat');
+      store.set('filter', filter);
+      renderChips();
+      renderList();
+    });
   });
 
   el.countries.addEventListener('click', function (e) {
     var b = e.target.closest('.chip');
     if (!b) return;
-    country = b.getAttribute('data-country');
-    store.set('country', country);
-    renderCountries();
-    renderList();
+    keepChipsPinned(function () {
+      country = b.getAttribute('data-country');
+      store.set('country', country);
+      // A type with nothing in the new country falls back to All.
+      if (filter !== 'all' && filter !== 'fav' && !typeCounts()[filter]) { filter = 'all'; store.set('filter', filter); }
+      renderCountries();
+      renderChips();
+      renderList();
+    });
   });
 
   el.q.addEventListener('input', function () {
@@ -955,6 +975,44 @@
     theme = theme === 'dark' ? 'light' : 'dark';
     store.set('theme', theme);
     applyTheme();
+  });
+
+  /* ---------- Slim top bar and pinned chips ---------- */
+
+  var miniBar = $('#mini-bar'), miniSearch = $('#mini-search'), filters = $('#filters'), bigHeader = document.querySelector('header.top');
+  var scrollQueued = false;
+  // Where pinned things line up: just under the slim bar.
+  function pinLine() { return (parseFloat(getComputedStyle(miniBar).top) || 0) + miniBar.offsetHeight; }
+  function chipsPinned() { return window.scrollY > 0 && filters.getBoundingClientRect().top <= pinLine() + 0.5; }
+  // Changing country or type while the chips are pinned keeps the new list starting right under them.
+  function keepChipsPinned(change) {
+    var pinned = chipsPinned();
+    change();
+    if (pinned) {
+      var natural = document.querySelector('.tools').getBoundingClientRect().bottom + window.scrollY + (parseFloat(getComputedStyle(filters).marginTop) || 0);
+      window.scrollTo(0, Math.max(0, natural - pinLine()));
+    }
+    syncScrollUI();
+  }
+  function syncScrollUI() {
+    scrollQueued = false;
+    var line = pinLine();
+    var on = bigHeader.getBoundingClientRect().bottom <= line + 8;
+    if (on !== miniBar.classList.contains('is-on')) {
+      miniBar.classList.toggle('is-on', on);
+      miniBar.setAttribute('aria-hidden', String(!on));
+      miniSearch.tabIndex = on ? 0 : -1;
+    }
+    filters.classList.toggle('is-stuck', chipsPinned());
+  }
+  window.addEventListener('scroll', function () {
+    if (!scrollQueued) { scrollQueued = true; requestAnimationFrame(syncScrollUI); }
+  }, { passive: true });
+  window.addEventListener('resize', syncScrollUI);
+  // Tap the bar to go back to the top; the search icon also opens the search box.
+  miniBar.addEventListener('click', function (e) {
+    if (e.target.closest('.mini-search')) el.q.focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   // Fade the edge of a chip row while more chips are hidden off that side.
@@ -1055,6 +1113,7 @@
   }
 
   var shared = openSharedStation();
+  if (filter !== 'all' && filter !== 'fav' && !typeCounts()[filter]) filter = 'all';
   renderCountries();
   renderChips();
   renderList();
@@ -1072,6 +1131,7 @@
   renderPlayer();
   renderSleep();
   applyTheme();
+  syncScrollUI();
   try { document.getElementById('year').textContent = new Date().getFullYear(); } catch (e) {}
   syncPlayerSpace();
   syncAllHints();

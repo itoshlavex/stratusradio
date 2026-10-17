@@ -56,6 +56,7 @@
   --gutter-l: max(16px, env(safe-area-inset-left, 0px));
   --gutter-r: max(16px, env(safe-area-inset-right, 0px));
   --player-h: 72px;
+  --mini-h: 52px;
   --player-gap: 10px;
   --player-edge: transparent;
   color-scheme: light;
@@ -155,6 +156,41 @@ button { font: inherit; color: inherit; }
 .theme-btn[data-mode="dark"] .i-light,
 .theme-btn:not([data-mode]) .i-dark { display: block; }
 
+/* Slim top bar, shown once the big header has scrolled away (like Spotify's title bar) */
+.mini-bar {
+  position: fixed; z-index: 24; left: 0; right: 0;
+  top: env(safe-area-inset-top, 0px); height: var(--mini-h);
+  display: flex; align-items: center; gap: 10px;
+  padding-left: max(var(--gutter-l), calc((100% - 760px) / 2 + 16px));
+  padding-right: max(calc(var(--gutter-r) - 8px), calc((100% - 760px) / 2 + 8px));
+  background: var(--header-bg); color: var(--header-fg);
+  cursor: pointer;
+  transform: translateY(-100%); opacity: 0; pointer-events: none;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.mini-bar.is-on { transform: none; opacity: 1; pointer-events: auto; }
+.mini-logo { flex: none; width: 32px; height: 32px; border-radius: 50%; display: block; }
+.mini-word { flex: 1; min-width: 0; font: 700 1.3125rem/1 var(--display); letter-spacing: -0.01em; white-space: nowrap; }
+.mini-word .w2 { color: var(--brand-sky); }
+.mini-search {
+  flex: none; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%;
+  display: grid; place-items: center; background: transparent; color: var(--header-fg); cursor: pointer;
+}
+.mini-search svg { width: 22px; height: 22px; }
+@media (prefers-reduced-motion: reduce) { .mini-bar { transition: none; } }
+
+/* Country and station-type chips stay pinned under the slim bar while the list scrolls */
+.filters {
+  position: sticky; z-index: 15;
+  top: calc(env(safe-area-inset-top, 0px) + var(--mini-h));
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px;
+  margin: 6px calc(-1 * var(--gutter-r)) 0 calc(-1 * var(--gutter-l));
+  padding: 6px var(--gutter-r) 8px var(--gutter-l);
+  background: var(--bg);
+  transition: box-shadow 0.2s ease;
+}
+.filters.is-stuck { box-shadow: 0 10px 14px -12px rgba(2, 16, 50, 0.35); }
+
 /* Main column */
 .wrap {
   max-width: 760px; margin: 0 auto;
@@ -208,6 +244,7 @@ button { font: inherit; color: inherit; }
 .chips-sub { gap: 4px; margin-top: -4px; }
 .chips-sub .chip { border-color: transparent; padding: 5px 12px; font-size: 0.875rem; color: var(--muted); }
 .chips-sub .chip[aria-pressed="true"] { background: var(--surface); border-color: var(--surface); color: var(--accent); }
+.chips-sub .chip[aria-pressed="true"] .n { color: var(--accent); opacity: 0.75; }
 
 .count {
   margin: 18px 0 6px;
