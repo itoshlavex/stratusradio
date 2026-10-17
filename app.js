@@ -285,6 +285,7 @@
       try { navigator.mediaSession.playbackState = isActive() ? 'playing' : (current ? 'paused' : 'none'); } catch (e) {}
     }
     document.title = current && isActive() ? current.name + ' – Stratus Radio' : 'Stratus Radio';
+    syncApp();
   }
 
   function renderPlayer() {
@@ -692,7 +693,8 @@
       poll();
     }
     timers.np = setInterval(function () {
-      if (current !== st || state !== 'live' || document.hidden) return;
+      // In the Android app the song also shows in the notification, so keep it fresh there.
+      if (current !== st || state !== 'live' || (document.hidden && !appBridge)) return;
       poll();
     }, 30000);
   }
@@ -750,6 +752,7 @@
   }
 
   function updateMediaMeta() {
+    syncApp();
     if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined' || !current) return;
     var where = [current.freq, placeOf(current)].filter(Boolean).join(' · ');
     try {
@@ -796,6 +799,39 @@
   }
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(function () { artCache = {}; updateMediaMeta(); });
+  }
+
+  /* ---------- Android app: "now playing" notification ---------- */
+
+  // In the Android app (android/), the page tells the app what's on, and the app
+  // shows it in a notification and on the lock screen (NowPlayingPlugin.java).
+  // Taps on its buttons come back here as 'control' events.
+  var appBridge = /StratusRadioApp/.test(navigator.userAgent) && window.Capacitor &&
+    window.Capacitor.nativePromise && window.Capacitor.addListener ? window.Capacitor : null;
+  var appSent = '';
+  function syncApp() {
+    if (!appBridge) return;
+    var info = {
+      state: !current || state === 'idle' || state === 'offline' || state === 'error' ? 'stopped'
+        : state === 'live' ? 'playing' : state === 'paused' ? 'paused' : 'loading',
+      station: current ? current.name : '',
+      title: nowPlaying,
+      detail: current ? [current.freq, placeOf(current)].filter(Boolean).join(' · ') : '',
+      artwork: current && logoOf(current) ? new URL(logoOf(current), location.href).href : ''
+    };
+    var key = JSON.stringify(info);
+    if (key === appSent) return;
+    appSent = key;
+    appBridge.nativePromise('NowPlaying', 'update', info).catch(function () {});
+  }
+  if (appBridge) {
+    appBridge.addListener('NowPlaying', 'control', function (data) {
+      var action = data && data.action;
+      if (action === 'play') { if (!isActive()) resume(); }
+      else if (action === 'pause') { if (isActive()) pause(); }
+      else if (action === 'next') step(1);
+      else if (action === 'previous') step(-1);
+    });
   }
 
   /* ---------- Sleep timer ---------- */
