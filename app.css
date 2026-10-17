@@ -316,6 +316,20 @@ button { font: inherit; color: inherit; }
   border: 0; background: none; color: var(--accent); font-weight: 700; padding: 10px 4px; cursor: pointer;
 }
 
+/* When Stratus is added to the home screen, the page runs under the iPhone's clock and
+   battery and below the floating player. These keep both areas tidy (they have no size
+   in the browser, where Safari's own bars cover those areas). */
+.statusbar-bg {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 25; pointer-events: none;
+  height: env(safe-area-inset-top, 0px);
+  background: var(--header-bg);
+}
+.player-shade {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 19; pointer-events: none;
+  height: calc(var(--player-space, 110px) + 16px);
+  background: linear-gradient(to bottom, transparent, var(--bg) 28px);
+}
+
 /* Floating player */
 .player {
   position: fixed; z-index: 20;
@@ -350,12 +364,13 @@ button { font: inherit; color: inherit; }
 .p-scroll-t { flex: none; }
 .p-scroll.is-long {
   width: calc(100% - 13px);
-  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 16px), transparent);
-  mask-image: linear-gradient(to right, #000 calc(100% - 16px), transparent);
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
 }
+/* While moving, letters fade out gently on the left instead of leaving cut-off pieces */
 .p-scroll.is-long.is-moving {
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 10px, #000 calc(100% - 16px), transparent);
-  mask-image: linear-gradient(to right, transparent, #000 10px, #000 calc(100% - 16px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 26px, #000 calc(100% - 22px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 26px, #000 calc(100% - 22px), transparent);
 }
 @media (prefers-reduced-motion: reduce) {
   .p-scroll-in, .p-scroll-t { display: inline; }
