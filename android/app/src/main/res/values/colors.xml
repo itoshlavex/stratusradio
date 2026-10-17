@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Taken from manifest.webmanifest and app.css so the native parts and the site
+  agree: the brand navy (the header and theme_color) for the status bar, and
+  for the splash and whatever shows before the site paints.
+-->
 <resources>
-    <!-- The brand navy: the header colour in app.css -->
-    <color name="navy">#021A4F</color>
+    <color name="colorPrimary">#021A4F</color>
+    <color name="colorPrimaryDark">#021A4F</color>
+    <color name="colorAccent">#0052F0</color>
+    <color name="stratusBackground">#021A4F</color>
 </resources>

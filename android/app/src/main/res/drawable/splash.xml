@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Replaces the splash.png set Capacitor scaffolds, which carries Capacitor's own
+  artwork. The brand navy with the Stratus Radio mark in the middle.
+
+  Drawn rather than drawn-at-five-densities: a colour and a centred mark need no
+  raster. The density-specific splash.png files were deleted with this; if any
+  comes back, aapt fails on the duplicate name.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/stratusBackground" />
+    <item
+        android:width="176dp"
+        android:height="176dp"
+        android:gravity="center"
+        android:drawable="@mipmap/ic_launcher_foreground" />
+</layer-list>

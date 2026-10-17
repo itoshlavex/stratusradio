@@ -45,14 +45,17 @@ The stream addresses came from each station's own website or player where possib
 
 ## The Android app
 
-`download/stratusradio.apk`, served at https://stratusradio.ololiohill.io/download/stratusradio.apk. Package `io.ololiohill.stratusradio`, Android 7.0 and newer. Android phones see a small "App" button beside the company name at the bottom of the page; iPhones and computers don't, since they can't install it.
+`download/stratusradio.apk`, served at https://stratusradio.ololiohill.io/download/stratusradio.apk. Package `io.ololiohill.stratusradio`, Android 7.0 and newer. Android phones see a small "App" button beside the company name at the bottom of the page; iPhones and computers don't, since they can't install it, and neither does the app itself.
 
-- **It opens the live site in the phone's Chrome**, full screen with no address bar (a Trusted Web Activity, built on Google's Android Browser Helper). Chrome does the playing, so the radio keeps going with the screen off and has play/pause on the lock screen. Changes to the site reach the app straight away: rebuild the APK only for a new icon, name or version.
-- **Chrome hides the address bar only because** `.well-known/assetlinks.json` lists the app's package and signing certificate. Don't remove or change that file.
-- **Release it from the Actions tab:** run the **APK** workflow and type a version, like `1.0.1`. It builds, signs, checks the certificate against `assetlinks.json`, counts `versionCode` up and commits the new APK to `main`, and Cloudflare publishes it.
+It is built the same way as RollCall's app:
+
+- **It is a shell around the live site, not a copy of it.** A Capacitor app whose window loads https://stratusradio.ololiohill.io (`capacitor.config.json`). Changes to the stations or the player reach installed phones straight away: rebuild the APK only for a new icon, name or version.
+- **The first launch needs a connection.** After that the service worker keeps the app itself, as it does in a browser. With no connection at all, the app shows `android-shell/index.html` instead of an error page. That folder is the only thing built into the APK.
+- **The app's window adds `StratusRadioApp` to its user agent**, which is how the site knows not to show the "App" button inside the app.
+- **Release it from the Actions tab:** run the **APK** workflow and type a version, like `1.0.2`. It restores the signing key from secrets, counts `versionCode` up, builds with `npm run apk`, checks the certificate, and commits the APK and `android/app/build.gradle` to `main`; Cloudflare publishes it from there. `npm run apk` also builds on a machine that has the key, a JDK and the Android SDK.
 - **The signing key** is in two Actions secrets, `ANDROID_KEYSTORE_BASE64` and `ANDROID_KEYSTORE_PASSWORD`, and in the owner's own backup. It is never in the repo. Android installs an update only if it is signed with the same key, so if the key is lost, everyone has to uninstall the app before they can get a newer one.
-- **The certificate** (SHA-256) is `ED:B0:49:10:CB:DF:3F:CD:4A:89:D0:EC:D4:86:69:BB:8E:06:EF:D9:C2:6F:A8:18:11:E1:09:55:89:45:3E:C6`, `CN=Stratus Radio, O=Ololio Hill Technologies`.
-- Shipped: 1.0 / versionCode 1 (17 October 2026).
+- **The certificate** (SHA-256) is `edb04910cbdf3fcd4a89d0ecd48669bb8e06efd9c26fa81811e1095589453ec6`, `CN=Stratus Radio, O=Ololio Hill Technologies`.
+- Shipped: 1.0 / versionCode 1 (17 October 2026, opened in Chrome; replaced), 1.0.1 / versionCode 2 (17 October 2026, the Capacitor app).
 
 ## Files
 
@@ -66,9 +69,9 @@ The stream addresses came from each station's own website or player where possib
 | `manifest.webmanifest` | Home-screen app name and colours |
 | `logo.png`, `icon-*.png`, `apple-touch-icon.png`, `favicon-32.png` | Stratus Radio logo and app icons |
 | `og-image.jpg` | The picture shown when the app's link is shared in WhatsApp, Facebook and other apps |
-| `android/` | The Android app (see above) |
+| `android/`, `capacitor.config.json`, `android-shell/` | The Android app (see above) |
+| `package.json`, `scripts/build-apk.mjs` | Builds the Android app (`npm run apk`); the site itself needs no build |
 | `download/stratusradio.apk` | The built Android app |
-| `.well-known/assetlinks.json` | Tells Chrome the Android app belongs to this site |
 | `_headers` | Tells Cloudflare phones may keep the station logos for a long time |
 | `logos/` | Station logos, one square image per station, named after the station's `id` |
 | `worker.js` | Small Cloudflare helper behind `/api/now`: reads the song name a station sends inside its stream (browsers can't), so the app can show it |

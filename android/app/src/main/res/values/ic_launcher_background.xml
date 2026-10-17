@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The background layer of the adaptive launcher icon, under the white disc and
+  S in mipmap-*/ic_launcher_foreground.png. Navy, like apple-touch-icon.png and
+  icon-maskable-512.png, so the icon looks the same on Android and iPhone.
+-->
+<resources>
+    <color name="ic_launcher_background">#021A4F</color>
+</resources>

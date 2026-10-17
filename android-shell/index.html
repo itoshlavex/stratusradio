@@ -1,0 +1,42 @@
+<!doctype html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Stratus Radio</title>
+<!--
+  Shown by the Android app (capacitor.config.json, server.errorPath) when
+  https://stratusradio.ololiohill.io can't be reached. The app loads the live
+  site, so this is the only page built into it.
+-->
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    display: grid;
+    place-content: center;
+    gap: 1rem;
+    padding: 2rem;
+    background: #021A4F;
+    color: #FFFFFF;
+    font-family: "Nunito Sans", system-ui, -apple-system, sans-serif;
+    text-align: center;
+  }
+  img { width: 88px; height: 88px; margin: 0 auto; border-radius: 50%; }
+  h1 { font-size: 1.35rem; margin: 0; }
+  p { margin: 0; max-width: 30ch; line-height: 1.5; color: #9FDCFF; }
+  button {
+    justify-self: center;
+    margin-top: 0.5rem;
+    padding: 0.7rem 1.6rem;
+    font: inherit;
+    font-weight: 700;
+    color: #021A4F;
+    background: #18B9FD;
+    border: 0;
+    border-radius: 999px;
+  }
+</style>
+<img src="icon-192.png" alt="" />
+<h1>Stratus Radio can't reach the internet</h1>
+<p>Check your mobile data or Wi-Fi, then try again. Once it has opened, the app opens without a signal too.</p>
+<button onclick="location.replace('https://stratusradio.ololiohill.io')">Try again</button>

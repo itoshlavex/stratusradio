@@ -1184,8 +1184,9 @@
   })();
   try { document.getElementById('year').textContent = new Date().getFullYear(); } catch (e) {}
   // Android phones in a browser get a link to the Android app; not iPhones, computers,
-  // or the app itself (opened from the app, or as an installed home-screen app).
-  var inApp = /^android-app:/.test(document.referrer) ||
+  // or the app itself (its WebView adds "StratusRadioApp" to the user agent, see
+  // capacitor.config.json), nor an installed home-screen app.
+  var inApp = /StratusRadioApp/.test(navigator.userAgent) ||
     (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
   if (/Android/i.test(navigator.userAgent) && !inApp) $('#get-app').hidden = false;
   syncPlayerSpace();

@@ -9,7 +9,3 @@
 /download/*
   Cache-Control: no-store
   Content-Type: application/vnd.android.package-archive
-
-# Lets Chrome open the Android app full screen (see android/).
-/.well-known/assetlinks.json
-  Content-Type: application/json

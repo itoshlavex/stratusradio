@@ -1,77 +1,92 @@
-/*
-  Stratus Radio for Android: a Trusted Web Activity.
+apply plugin: 'com.android.application'
 
-  The app opens https://stratusradio.ololiohill.io in the phone's Chrome, full
-  screen with no address bar, rather than carrying its own copy of the site. A
-  deploy reaches installed phones straight away; rebuild the APK only for the
-  icon, the name or a new version.
-
-  Chrome does the playing, so the radio keeps going with the screen off and has
-  play/pause on the lock screen, as the site does in Chrome. (An app built on
-  Android's WebView, like RollCall's, gets neither without a lot of extra code.)
-*/
-plugins {
-    id 'com.android.application'
-}
-
-// The signing key is never in the repo. The APK workflow writes a
-// keystore.properties on the runner from the repository's secrets and points
-// STRATUS_KEYSTORE_PROPERTIES at it (storeFile, storePassword, keyAlias, keyPassword).
-def keystoreProps = new Properties()
-def keystorePath = System.getenv('STRATUS_KEYSTORE_PROPERTIES')
-if (keystorePath && file(keystorePath).exists()) {
-    file(keystorePath).withInputStream { keystoreProps.load(it) }
+// Release signing.
+//
+// The keystore and its password live OUTSIDE this repository - by default
+// <user.home>/keys/stratusradio/keystore.properties, overridable with the
+// STRATUS_KEYSTORE_PROPERTIES environment variable. Nothing secret is ever
+// committed. The APK workflow writes this file on the runner from the
+// repository's Actions secrets.
+//
+// Android installs an update only if it carries the same signature as the
+// build already on the phone. If this key is lost, everyone has to uninstall
+// Stratus Radio before they can take another version.
+//
+// A machine without it still builds - unsigned release, debuggable debug -
+// so a checkout can be compiled without handing the key around.
+def keystorePropertiesPath = System.getenv("STRATUS_KEYSTORE_PROPERTIES") ?:
+        System.getProperty("user.home") + "/keys/stratusradio/keystore.properties"
+def keystorePropertiesFile = file(keystorePropertiesPath)
+def haveKeystore = keystorePropertiesFile.exists()
+def keystoreProperties = new Properties()
+if (haveKeystore) {
+    keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+} else {
+    logger.warn("Stratus Radio: no signing key at " + keystorePropertiesPath + " - release build will be unsigned.")
 }
 
 android {
-    namespace 'io.ololiohill.stratusradio'
-    compileSdk 36
-
+    namespace = "io.ololiohill.stratusradio"
+    compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        // Permanent: Android knows the app by this id. Changing it makes the next
-        // APK a different app that everyone would have to install separately.
-        applicationId 'io.ololiohill.stratusradio'
-        // Android 7.0, the floor of the Android Browser Helper library (and RollCall's too).
-        minSdk 24
-        targetSdk 36
-        versionCode 1
-        versionName "1.0"
+        applicationId "io.ololiohill.stratusradio"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 2
+        versionName "1.0.1"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
     }
-
     signingConfigs {
-        release {
-            if (keystoreProps.storeFile) {
-                storeFile file(keystoreProps.storeFile)
-                storePassword keystoreProps.storePassword
-                keyAlias keystoreProps.keyAlias
-                keyPassword keystoreProps.keyPassword
+        if (haveKeystore) {
+            release {
+                storeFile file(keystoreProperties["storeFile"])
+                storePassword keystoreProperties["storePassword"]
+                keyAlias keystoreProperties["keyAlias"]
+                keyPassword keystoreProperties["keyPassword"]
             }
         }
     }
-
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
-            signingConfig signingConfigs.release
+            if (haveKeystore) {
+                signingConfig signingConfigs.release
+            }
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+}
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
     }
 }
 
 dependencies {
-    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.7.4'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
 }
 
-// Without the key, gradle would quietly write an unsigned APK that no phone installs.
-gradle.taskGraph.whenReady { graph ->
-    if (graph.allTasks.any { it.path == ':app:assembleRelease' } && !keystoreProps.storeFile) {
-        throw new GradleException('No signing key. Build the APK with the APK workflow on GitHub, ' +
-            'or set STRATUS_KEYSTORE_PROPERTIES to a keystore.properties file.')
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
     }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
 }

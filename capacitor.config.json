@@ -1,0 +1,13 @@
+{
+  "appId": "io.ololiohill.stratusradio",
+  "appName": "Stratus Radio",
+  "webDir": "android-shell",
+  "android": {
+    "backgroundColor": "#021A4F",
+    "appendUserAgent": "StratusRadioApp"
+  },
+  "server": {
+    "url": "https://stratusradio.ololiohill.io",
+    "errorPath": "index.html"
+  }
+}

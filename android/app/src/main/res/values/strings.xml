@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="appName">Stratus Radio</string>
-    <string name="providerAuthority">io.ololiohill.stratusradio.fileprovider</string>
-    <!-- The site this app may open full screen. The site says the same back in /.well-known/assetlinks.json. -->
-    <string name="assetStatements" translatable="false">[{\"relation\": [\"delegate_permission/common.handle_all_urls\"], \"target\": {\"namespace\": \"web\", \"site\": \"https://stratusradio.ololiohill.io\"}}]</string>
+    <string name="app_name">Stratus Radio</string>
+    <string name="title_activity_main">Stratus Radio</string>
+    <string name="package_name">io.ololiohill.stratusradio</string>
+    <string name="custom_url_scheme">io.ololiohill.stratusradio</string>
 </resources>

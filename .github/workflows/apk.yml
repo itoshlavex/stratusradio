@@ -3,19 +3,20 @@ name: APK
 # Builds and signs the Android app, then puts it where the site serves it
 # (https://stratusradio.ololiohill.io/download/stratusradio.apk).
 #
-# Run from the Actions tab. Nothing here happens on a push: the app opens the
-# live site, so a change to the stations or the player reaches installed phones
-# through a normal deploy. Only the icon, the name or a new version is a reason
-# to build a new APK.
+# Run from the Actions tab. Nothing here happens on a push: the APK is a shell
+# around the deployed site, so a change to the stations or the player reaches
+# installed phones through a normal deploy and only the icon, the name or a
+# version bump is a reason to build a new one.
 #
-# The signing key lives in the repository's Actions secrets, never in the repo:
-# Android takes an update only if it carries the same signature as the build
-# already on the phone, so the key cannot be replaced.
+# The signing key lives in Actions secrets rather than in the repository - a
+# file committed to git is in every clone of it forever, and this key cannot be
+# rotated: Android takes an update only if it carries the same signature as the
+# build already on the phone.
 on:
   workflow_dispatch:
     inputs:
       version_name:
-        description: "Version people see, e.g. 1.0.1"
+        description: "Version people see, e.g. 1.0.2"
         required: true
         type: string
 
@@ -27,17 +28,24 @@ jobs:
   apk:
     runs-on: ubuntu-latest
     permissions:
-      # Commits the built APK back to main; Cloudflare deploys it from there.
+      # Commits the built APK back to main. Cloudflare deploys it from there.
       contents: write
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
+
+      - run: npm ci
 
       - name: Restore the signing key
         env:
@@ -50,8 +58,9 @@ jobs:
           fi
           mkdir -p "$RUNNER_TEMP/keys"
           printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/keys/stratusradio-release.jks"
-          # Written on the runner, never committed. android/app/build.gradle
-          # reads the path out of this variable.
+          # Written on the runner, never committed. build.gradle reads the path
+          # out of this variable rather than the default under the home
+          # directory.
           {
             echo "storeFile=$RUNNER_TEMP/keys/stratusradio-release.jks"
             echo "storePassword=$KEYSTORE_PASSWORD"
@@ -68,33 +77,26 @@ jobs:
         run: |
           current=$(grep -oP 'versionCode \K\d+' android/app/build.gradle)
           next=$((current + 1))
-          # Android refuses an update whose versionCode is not higher than the
-          # installed one, so it counts up here rather than by hand.
+          # versionCode counts up on its own. It is what Android compares, and
+          # an update whose code is not higher than the installed build's is
+          # refused, so it is not left to whoever runs this to remember.
           sed -i "s/versionCode $current/versionCode $next/" android/app/build.gradle
           sed -i "s/versionName \"[^\"]*\"/versionName \"$VERSION_NAME\"/" android/app/build.gradle
           echo "APK_VERSION_CODE=$next" >> "$GITHUB_ENV"
           echo "Building $VERSION_NAME, versionCode $next."
 
       - name: Build
-        working-directory: android
-        run: |
-          ./gradlew --no-daemon assembleRelease
-          cp app/build/outputs/apk/release/app-release.apk ../download/stratusradio.apk
+        run: npm run apk
 
       - name: Check it is signed with the Stratus Radio key
-        # The certificate must be the one the site lists in assetlinks.json, or
-        # Chrome shows an address bar over the app and phones refuse the update.
+        # Any other certificate would not install over the app people already have.
         run: |
           apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
           "$apksigner" verify --print-certs download/stratusradio.apk | tee certs.txt
-          got=$(grep -oP 'SHA-256 digest: \K[0-9a-f]+' certs.txt | head -1)
-          want=$(grep -oP '"sha256_cert_fingerprints": \["\K[0-9A-F:]+' .well-known/assetlinks.json | tr -d ':' | tr 'A-F' 'a-f')
-          if [ "$got" != "$want" ]; then
-            echo "Signed with $got, but assetlinks.json lists $want." >&2
-            exit 1
-          fi
+          grep -q "SHA-256 digest: edb04910cbdf3fcd4a89d0ecd48669bb8e06efd9c26fa81811e1095589453ec6" certs.txt
 
-      # Kept on the run as well as committed, so it can be downloaded straight away.
+      # Kept on the run itself as well as committed, so the file can be
+      # downloaded straight away without waiting for the deploy.
       - uses: actions/upload-artifact@v4
         with:
           name: stratusradio-apk

@@ -8,3 +8,8 @@ wrangler.jsonc
 worker.js
 README.md
 android
+android-shell
+scripts
+package.json
+package-lock.json
+capacitor.config.json
