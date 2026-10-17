@@ -7,6 +7,7 @@ Live radio from across the Pacific, by [Ololio Hill Technologies](https://ololio
 - Stations from Papua New Guinea and across the Pacific, plus New Zealand and Australia (Pacific, Torres Strait and First Nations stations, public radio and the main networks), RNZ Pacific and ABC Radio Australia. Every stream in the list has been checked to play.
 - Choose a country, filter by Music, News & talk or Christian, or search by station, town, country or language.
 - Favourites, saved on each phone.
+- Share the app: the paper-plane button at the top shares the link to Stratus Radio itself.
 - Share a station: the paper-plane button beside each station sends a short link, like `https://stratusradio.ololiohill.io/yumi-fm`, that opens Stratus Radio with that station ready to play. The part after the `/` is the station's `id` in `stations.js`.
 - Light mode by default; tap the button in the header to switch to dark (the choice is remembered).
 - Keeps playing with the screen locked. Play, pause and change station from the lock screen or headphones.
@@ -53,6 +54,7 @@ The stream addresses came from each station's own website or player where possib
 | `sw.js` | Lets the app open when offline |
 | `manifest.webmanifest` | Home-screen app name and colours |
 | `logo.png`, `icon-*.png`, `apple-touch-icon.png`, `favicon-32.png` | Stratus Radio logo and app icons |
+| `og-image.jpg` | The picture shown when the app's link is shared in WhatsApp, Facebook and other apps |
 | `_headers` | Tells Cloudflare phones may keep the station logos for a long time |
 | `logos/` | Station logos, one square image per station, named after the station's `id` |
 | `worker.js` | Small Cloudflare helper behind `/api/now`: reads the song name a station sends inside its stream (browsers can't), so the app can show it |

@@ -1102,13 +1102,10 @@
     }
   }
 
-  function shareStation(st) {
-    if (!st) return;
-    var url = stationLink(st);
-    // Just the link: chat apps show their own preview card for it.
-    var data = { title: st.name + ' on Stratus Radio', url: url };
+  // Just the link: chat apps show their own preview card for it.
+  function shareLink(title, url) {
     if (navigator.share) {
-      navigator.share(data).catch(function (err) {
+      navigator.share({ title: title, url: url }).catch(function (err) {
         // Closing the share sheet isn't an error; anything else falls back to copying.
         if (!err || err.name !== 'AbortError') copyText(url);
       });
@@ -1116,6 +1113,15 @@
       copyText(url);
     }
   }
+
+  function shareStation(st) {
+    if (st) shareLink(st.name + ' on Stratus Radio', stationLink(st));
+  }
+
+  // The paper plane at the top shares the app itself.
+  $('#share-app').addEventListener('click', function () {
+    shareLink('Stratus Radio', location.origin + '/');
+  });
 
   // Opened from a shared link: pick that station and show it, ready to play.
   function openSharedStation() {

@@ -141,16 +141,17 @@ button { font: inherit; color: inherit; }
 .wave-front { fill: var(--header-bg); }
 .wave-back { fill: var(--wave-back); }
 
-/* Light / dark switch */
-.theme-btn {
-  flex: none; align-self: flex-start; margin-top: 2px;
+/* Round buttons at the top right: share the app, and the light / dark switch */
+.top-actions { flex: none; align-self: flex-start; margin-top: 2px; display: flex; gap: 8px; }
+.top-btn {
   width: 40px; height: 40px; padding: 0; border-radius: 50%;
   display: grid; place-items: center;
   background: transparent; color: var(--header-fg);
   border: 1.5px solid rgba(255, 255, 255, 0.25);
   cursor: pointer;
 }
-.theme-btn svg { width: 20px; height: 20px; grid-area: 1 / 1; display: none; }
+.top-btn svg { width: 20px; height: 20px; grid-area: 1 / 1; }
+.theme-btn svg { display: none; }
 /* The icon shows what a tap switches to: a moon in light mode, a sun in dark mode. */
 .theme-btn[data-mode="light"] .i-dark,
 .theme-btn[data-mode="dark"] .i-light,
@@ -524,10 +525,15 @@ button { font: inherit; color: inherit; }
   box-shadow: 0 6px 20px rgba(2, 16, 50, 0.25);
 }
 
+@media (max-width: 400px) {
+  .top-actions { gap: 6px; }
+  .top-btn { width: 36px; height: 36px; }
+  .top-btn svg { width: 18px; height: 18px; }
+}
 @media (max-width: 360px) {
   .player-inner { gap: 6px; }
   .logo { width: 48px; height: 48px; }
-  .wordmark { font-size: 1.625rem; }
+  .wordmark { font-size: 1.5rem; }
 }
 @media (min-width: 640px) {
   .logo { width: 76px; height: 76px; }
