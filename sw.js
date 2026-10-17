@@ -1,6 +1,6 @@
 /* Stratus Radio service worker: keeps the app itself available offline.
    Radio streams and live station lookups always go straight to the network. */
-var CACHE = 'stratus-v5';
+var CACHE = 'stratus-v6';
 var SHELL = [
   './',
   'index.html',
