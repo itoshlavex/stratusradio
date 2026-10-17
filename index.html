@@ -35,6 +35,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:wght@400;600;700&display=swap">
 <link rel="stylesheet" href="app.css">
 <script>
+  /* Hide station tiles until their logos are drawn (app.js removes this; at most 0.6 s). */
+  document.documentElement.classList.add('logos-pending');
   /* Light unless dark was chosen; applied before the page draws, so it doesn't flash. */
   try { if (JSON.parse(localStorage.getItem('stratus:theme')) === 'dark') document.documentElement.setAttribute('data-theme', 'dark'); } catch (e) {}
 </script>

@@ -291,6 +291,10 @@ button { font: inherit; color: inherit; }
   position: relative; overflow: hidden;
 }
 /* Station logo covers the tile; the frequency/letters underneath show if it fails to load */
+/* On opening, the list and player appear once the logos on screen are ready, so they never pop in */
+.logos-pending .list, .logos-pending #p-tile { opacity: 0; animation: show-anyway 0s 1s forwards; }
+.list, #p-tile { transition: opacity 0.15s ease; }
+@keyframes show-anyway { to { opacity: 1; } } /* safety net if the script never runs */
 .tile-logo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
 .tile.has-logo > span { visibility: hidden; }
 .tile.has-logo::after {

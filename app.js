@@ -133,7 +133,7 @@
       ? '<span class="tile-freq' + (f.num.length > 4 ? ' is-long' : '') + '">' + esc(f.num) + '</span><span class="tile-band">' + esc(f.band) + '</span>'
       : '<span class="tile-short">' + esc(st.short || initials(st.name)) + '</span>';
     var logo = logoOf(st);
-    return text + (logo ? '<img class="tile-logo" src="' + esc(logo) + '" alt="" loading="lazy" decoding="async" data-id="' + esc(st.id) + '">' : '');
+    return text + (logo ? '<img class="tile-logo" src="' + esc(logo) + '" alt="" decoding="async" data-id="' + esc(st.id) + '">' : '');
   }
   document.addEventListener('error', function (e) {
     var img = e.target;
@@ -219,10 +219,17 @@
     syncScrollHints(el.chips);
   }
 
+  // Every station row is built once; filters and search only show or hide rows, so logos are
+  // never redrawn. (Rows are in the same order as the stations list.)
+  var rowsBuilt = false;
   function renderList() {
-    var list = allStations().filter(matches);
-    el.list.innerHTML = list.map(rowHTML).join('');
-    var n = list.length;
+    if (!rowsBuilt) { el.list.innerHTML = allStations().map(rowHTML).join(''); rowsBuilt = true; }
+    var rows = el.list.children, n = 0;
+    for (var i = 0; i < rows.length; i++) {
+      var show = matches(stations[i]);
+      if (rows[i].hidden === show) rows[i].hidden = !show;
+      if (show) n++;
+    }
     var noun = filter === 'fav' ? (n === 1 ? 'favourite' : 'favourites') : (n === 1 ? 'station' : 'stations');
     el.count.textContent = query ? n + ' ' + noun + ' match “' + query + '”' : n + ' ' + noun;
     el.count.hidden = n === 0;
@@ -287,13 +294,17 @@
     if (!current) {
       el.pTile.className = 'tile tile-sm';
       el.pTile.innerHTML = '';
+      el.pTile.removeAttribute('data-id');
       el.pName.textContent = 'Pick a station';
       el.pStatus.textContent = 'Tap any station to start listening';
       el.playBtn.setAttribute('aria-label', 'Play');
       return;
     }
-    el.pTile.className = tileClass(current, 'tile-sm');
-    el.pTile.innerHTML = tileHTML(current);
+    if (el.pTile.getAttribute('data-id') !== current.id) { // redraw the logo only when the station changes
+      el.pTile.className = tileClass(current, 'tile-sm');
+      el.pTile.innerHTML = tileHTML(current);
+      el.pTile.setAttribute('data-id', current.id);
+    }
     el.pName.textContent = current.name;
     el.playBtn.setAttribute('aria-label', isActive() ? 'Pause ' + current.name : 'Play ' + current.name);
 
@@ -856,12 +867,12 @@
     if (favs.has(st.id)) favs.delete(st.id); else favs.add(st.id);
     store.set('favs', Array.from(favs));
     renderChips();
-    if (filter === 'fav') { renderList(); return; }
     if (btn) {
       var on = favs.has(st.id);
       btn.setAttribute('aria-pressed', String(on));
       btn.setAttribute('aria-label', (on ? 'Remove ' : 'Add ') + st.name + (on ? ' from' : ' to') + ' favourites');
     }
+    if (filter === 'fav') renderList();
   }
 
   /* ---------- Events ---------- */
@@ -1135,6 +1146,18 @@
   renderSleep();
   applyTheme();
   syncScrollUI();
+  (function revealList() {
+    var onScreen = [].slice.call(el.list.querySelectorAll('.st:not([hidden]) .tile-logo')).filter(function (img) {
+      var r = img.getBoundingClientRect();
+      return r.top < window.innerHeight && r.bottom > 0;
+    }).concat([].slice.call(el.pTile.querySelectorAll('.tile-logo')));
+    var drawn = Promise.all(onScreen.map(function (img) {
+      return img.decode ? img.decode().catch(function () {}) : Promise.resolve();
+    }));
+    Promise.race([drawn, new Promise(function (r) { setTimeout(r, 600); })]).then(function () {
+      document.documentElement.classList.remove('logos-pending');
+    });
+  })();
   try { document.getElementById('year').textContent = new Date().getFullYear(); } catch (e) {}
   syncPlayerSpace();
   syncAllHints();
