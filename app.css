@@ -348,14 +348,15 @@ button { font: inherit; color: inherit; }
   font-size: var(--step--1); color: var(--muted);
 }
 .credit a { color: inherit; text-decoration: none; }
-/* Download icon beside the credit: gets the Android app */
+/* Small "App" pill beside the credit: downloads the Android app */
 .credit .get-app {
-  display: inline-grid; place-items: center; vertical-align: middle;
-  width: 36px; height: 36px; margin: -8px 0 -8px 4px;
-  color: var(--accent);
+  display: inline-flex; align-items: center; gap: 5px; vertical-align: middle;
+  margin: -6px 0 -6px 8px; padding: 6px 12px;
+  border: 1.5px solid var(--line); border-radius: 999px;
+  color: var(--ink); font-weight: 700; font-size: 0.75rem; line-height: 1;
 }
 .credit .get-app[hidden] { display: none; }
-.get-app svg { width: 22px; height: 22px; }
+.get-app svg { width: 15px; height: 15px; }
 
 /* Buttons */
 .btn-outline {

@@ -45,7 +45,7 @@ The stream addresses came from each station's own website or player where possib
 
 ## The Android app
 
-`download/stratusradio.apk`, served at https://stratusradio.ololiohill.io/download/stratusradio.apk. Package `io.ololiohill.stratusradio`, Android 7.0 and newer. Android phones see a download icon (an arrow in a circle) beside the company name at the bottom of the page; iPhones and computers don't, since they can't install it.
+`download/stratusradio.apk`, served at https://stratusradio.ololiohill.io/download/stratusradio.apk. Package `io.ololiohill.stratusradio`, Android 7.0 and newer. Android phones see a small "App" button beside the company name at the bottom of the page; iPhones and computers don't, since they can't install it.
 
 - **It opens the live site in the phone's Chrome**, full screen with no address bar (a Trusted Web Activity, built on Google's Android Browser Helper). Chrome does the playing, so the radio keeps going with the screen off and has play/pause on the lock screen. Changes to the site reach the app straight away: rebuild the APK only for a new icon, name or version.
 - **Chrome hides the address bar only because** `.well-known/assetlinks.json` lists the app's package and signing certificate. Don't remove or change that file.
