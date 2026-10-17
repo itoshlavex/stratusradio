@@ -364,13 +364,12 @@ button { font: inherit; color: inherit; }
 .p-scroll-t { flex: none; }
 .p-scroll.is-long {
   width: calc(100% - 13px);
-  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
-  mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 16px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 16px), transparent);
 }
-/* While moving, letters fade out gently on the left instead of leaving cut-off pieces */
 .p-scroll.is-long.is-moving {
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 26px, #000 calc(100% - 22px), transparent);
-  mask-image: linear-gradient(to right, transparent, #000 26px, #000 calc(100% - 22px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 10px, #000 calc(100% - 16px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 10px, #000 calc(100% - 16px), transparent);
 }
 @media (prefers-reduced-motion: reduce) {
   .p-scroll-in, .p-scroll-t { display: inline; }

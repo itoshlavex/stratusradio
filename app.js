@@ -609,6 +609,7 @@
     }).join(' ');
   }
   function prettyTitle(text) {
+    text = text.replace(/\s*\[\s*[+&]\s*\]\s*/g, ' & ');               // "Cxmmxns [+] Cain" -> "Cxmmxns & Cain"
     text = text.replace(/\s*(\[\s*\]|\(\s*\))\s*/g, ' ').trim(); // empty brackets: "feat [] Lady Saw"
     return text.replace(/,(?=[^\s\d])/g, ', ').split(/\s+[-–—]\s+/).map(fromCapitals).join(' · ');
   }
