@@ -93,7 +93,7 @@ jobs:
         run: |
           apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
           "$apksigner" verify --print-certs download/stratusradio.apk | tee certs.txt
-          grep -q "SHA-256 digest: edb04910cbdf3fcd4a89d0ecd48669bb8e06efd9c26fa81811e1095589453ec6" certs.txt
+          grep -q "SHA-256 digest: e758709f2c454d5a5d5aac8d110101cf41930b082c93a57d73a8b548c27bf3e9" certs.txt
 
       # Kept on the run itself as well as committed, so the file can be
       # downloaded straight away without waiting for the deploy.

@@ -90,7 +90,7 @@ console.log("");
 console.log("Check it before you hand it out - a build carrying any other certificate will");
 console.log("not install over the one people already have:");
 console.log("  apksigner verify --print-certs download/stratusradio.apk");
-console.log("  expected SHA-256 edb04910cbdf3fcd4a89d0ecd48669bb8e06efd9c26fa81811e1095589453ec6");
+console.log("  expected SHA-256 e758709f2c454d5a5d5aac8d110101cf41930b082c93a57d73a8b548c27bf3e9");
 console.log("");
 console.log("Then commit it and push to main. It is served at https://stratusradio.app/download/stratusradio.apk");
 console.log("You bumped versionCode by hand for this one; the APK workflow does it for you.");
