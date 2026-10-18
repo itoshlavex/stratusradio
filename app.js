@@ -668,27 +668,53 @@
   }
 
   // Other stations: worker.js reads the song name the station sends inside its stream.
-  var nowApiFails = 0;
+  //
+  // Three misses in a row and a lookup stops being asked: a station that never
+  // answers is not worth a request every thirty seconds for as long as someone
+  // listens. The two counts are deliberately different in reach. /api/now is
+  // ours, so if it is down it is down for every station and the count stands for
+  // the session. The AzuraCast and ABC lookups belong to the station, so that
+  // count is per station and starts again each time one is chosen - another
+  // station's outage says nothing about this one, and an API that was failing an
+  // hour ago may be answering now.
+  var NP_MAX_FAILS = 3;
+  var nowApiFails = 0; // /api/now, for the session
+  var npFails = 0;     // the station's own lookup, for this station
+  // An answer that arrives after the station changed is ignored: it says nothing
+  // about the one playing now, so it must neither count against it nor stop its
+  // timer, which by then belongs to a different station.
+  function npOk(st, use) {
+    return function (d) { if (current === st) { npFails = 0; use(d); } };
+  }
+  function npFailed(st) {
+    return function () { if (current === st && ++npFails >= NP_MAX_FAILS) clearInterval(timers.np); };
+  }
   function startNowPlaying() {
     clearInterval(timers.np);
     var st = current, poll;
     if (!st) return;
+    npFails = 0;
     if (st.resolve && st.resolve.type === 'azuracast') {
       // The first answer came with the stream lookup; refresh from here on.
-      poll = function () { fetchJSON(st.resolve.api, 7000).then(function (d) { applyNowPlaying(st, d); }).catch(function () {}); };
+      poll = function () {
+        fetchJSON(st.resolve.api, 7000)
+          .then(npOk(st, function (d) { applyNowPlaying(st, d); })).catch(npFailed(st));
+      };
     } else if (st.np && st.np.type === 'abc') {
       poll = function () {
         fetchJSON('https://music.abcradio.net.au/api/v1/plays/' + st.np.service + '/now.json', 7000)
-          .then(function (d) { setNowPlaying(st, abcSong(d)); }).catch(function () {});
+          .then(npOk(st, function (d) { setNowPlaying(st, abcSong(d)); })).catch(npFailed(st));
       };
       poll();
     } else {
       var src = urls[goodIndex];
-      if (!src || /\.m3u8(\?|$)/i.test(src) || nowApiFails >= 3) return;
+      if (!src || /\.m3u8(\?|$)/i.test(src) || nowApiFails >= NP_MAX_FAILS) return;
       poll = function () {
         fetchJSON('/api/now?u=' + encodeURIComponent(src), 9000)
           .then(function (d) { nowApiFails = 0; setNowPlaying(st, d && d.title); })
-          .catch(function () { if (++nowApiFails >= 3) clearInterval(timers.np); });
+          // Counted for the session even if the station has moved on, but only
+          // the current station's timer may be stopped.
+          .catch(function () { if (++nowApiFails >= NP_MAX_FAILS && current === st) clearInterval(timers.np); });
       };
       poll();
     }
