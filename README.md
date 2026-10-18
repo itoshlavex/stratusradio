@@ -19,7 +19,7 @@ Live radio from across the Pacific, by [Ololio Hill Technologies](https://ololio
 
 The app is hosted free on Cloudflare at **https://stratusradio.app**. That is its only address, and the one to push and deploy to.
 
-The old address, `stratusradio.ololiohill.io`, is kept attached to the Worker for one reason: `worker.js` answers it with a permanent redirect to `stratusradio.app`, keeping whatever path was asked for, so an old shared link like `.../yumi-fm` still opens its station. Nothing is served on it. There is no `*.workers.dev` address and no per-branch preview links.
+`www.stratusradio.app` and the old address, `stratusradio.ololiohill.io`, are both attached to the Worker for one reason: `worker.js` answers anything that is not `stratusradio.app` with a permanent redirect to it, keeping whatever path was asked for. So typing the `www.` gets there, and an old shared link like `.../yumi-fm` still opens its station. Nothing is served on either. There is no `*.workers.dev` address and no per-branch preview links.
 
 Cloudflare is linked to this GitHub repository. Every change to the `main` branch goes live on its own, usually within a minute. To update the app, change the files on `main`, either by editing them on github.com or with **Add file → Upload files** (keep files at the top level, not inside a folder; a file with the same name replaces the old one). Because preview links are off, a change pushed to any other branch is not published anywhere — check it locally with `npx wrangler dev`, then put it on `main`.
 
@@ -78,6 +78,6 @@ It is built the same way as RollCall's app:
 | `_headers` | Tells Cloudflare phones may keep the station logos for a long time |
 | `logos/` | Station logos, one square image per station, named after the station's `id` |
 | `worker.js` | Small Cloudflare helper behind `/api/now`: reads the song name a station sends inside its stream (browsers can't), so the app can show it |
-| `wrangler.jsonc` | Cloudflare hosting settings, including the `stratusradio.app` address and the redirect from the old one |
+| `wrangler.jsonc` | Cloudflare hosting settings, including the `stratusradio.app` address and the two that redirect to it |
 | `.assetsignore` | Files in the repo that Cloudflare keeps off the website (including `android/`) |
 | `.gitignore` | Files Git leaves out of the repo |

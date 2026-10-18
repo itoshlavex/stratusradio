@@ -19,13 +19,15 @@
     // open the app, which then picks that station.
     "not_found_handling": "single-page-application"
   },
-  // stratusradio.app is the app's address. stratusradio.ololiohill.io is kept
-  // here for one reason: it has to stay attached to the Worker for worker.js to
-  // answer it with a permanent redirect to stratusradio.app, so old links and
-  // already-installed phones keep working. Nothing is served on it. Take it out
-  // of this list and it detaches, stops redirecting, and simply fails instead.
+  // stratusradio.app is the app's address. The other two are attached for one
+  // reason each: worker.js answers anything that is not stratusradio.app with a
+  // permanent redirect to it, so the www. address works for anyone who types it,
+  // and old links to stratusradio.ololiohill.io still open their station.
+  // Nothing is served on either. Take one out of this list and it detaches,
+  // stops redirecting, and simply fails instead.
   "routes": [
     { "pattern": "stratusradio.app", "custom_domain": true },
+    { "pattern": "www.stratusradio.app", "custom_domain": true },
     { "pattern": "stratusradio.ololiohill.io", "custom_domain": true }
   ],
   // No *.workers.dev address, and no per-branch preview links on it either:
