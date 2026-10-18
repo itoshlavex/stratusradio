@@ -678,6 +678,12 @@
   // station's outage says nothing about this one, and an API that was failing an
   // hour ago may be answering now.
   var NP_MAX_FAILS = 3;
+  // Ask this often while a station plays. It matches CACHE_SECONDS in worker.js:
+  // /api/now holds an answer for twenty seconds, so asking more often than this
+  // only returns the same title again, and asking less often means a song can
+  // have changed a while before the app shows it. Raise both together or
+  // neither. The station's own API is asked on the same beat for simplicity.
+  var NP_EVERY_MS = 20000;
   var nowApiFails = 0; // /api/now, for the session
   var npFails = 0;     // the station's own lookup, for this station
   // An answer that arrives after the station changed is ignored: it says nothing
@@ -722,7 +728,7 @@
       // In the Android app the song also shows in the notification, so keep it fresh there.
       if (current !== st || state !== 'live' || (document.hidden && !appBridge)) return;
       poll();
-    }, 30000);
+    }, NP_EVERY_MS);
   }
 
   var hlsLoading = null;
