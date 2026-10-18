@@ -7,7 +7,7 @@
     "appendUserAgent": "StratusRadioApp"
   },
   "server": {
-    "url": "https://stratusradio.ololiohill.io",
+    "url": "https://stratusradio.app",
     "errorPath": "index.html"
   }
 }

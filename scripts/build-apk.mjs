@@ -1,6 +1,6 @@
 // Builds the Android APK and drops it where the site serves it.
 //
-// The APK is a shell around https://stratusradio.ololiohill.io - see
+// The APK is a shell around https://stratusradio.app - see
 // capacitor.config.json. Rebuilding it is only needed for the icon, the name, or
 // a version bump. A change to the stations or the player reaches installed phones
 // through a normal deploy, because the app loads the deployed site rather than a
@@ -92,5 +92,5 @@ console.log("not install over the one people already have:");
 console.log("  apksigner verify --print-certs download/stratusradio.apk");
 console.log("  expected SHA-256 edb04910cbdf3fcd4a89d0ecd48669bb8e06efd9c26fa81811e1095589453ec6");
 console.log("");
-console.log("Then commit it and push to main. It is served at https://stratusradio.ololiohill.io/download/stratusradio.apk");
+console.log("Then commit it and push to main. It is served at https://stratusradio.app/download/stratusradio.apk");
 console.log("You bumped versionCode by hand for this one; the APK workflow does it for you.");

@@ -1,6 +1,9 @@
 /* Stratus Radio on Cloudflare.
-   The app itself is plain files, served by Cloudflare without running any code.
-   This Worker only answers /api/now?u=<stream address>: it opens the station's
+   The app itself is plain files. This Worker stands in front of every address
+   (wrangler.jsonc, run_worker_first) for two reasons: it sends the old
+   stratusradio.ololiohill.io address to stratusradio.app, and it hands every
+   other request straight to Cloudflare's own file store, which serves it.
+   Its real work is /api/now?u=<stream address>: it opens the station's
    stream for a moment, reads the song or programme name the station sends inside
    it (Icecast/Shoutcast "ICY" metadata, which browsers can't read), and returns it
    as JSON. Answers are cached for 20 seconds, so a station is checked at most that
@@ -11,9 +14,23 @@ const CACHE_SECONDS = 20;
 const LIST_SECONDS = 600; // re-read stations.js this often
 const TIMEOUT_MS = 8000;
 
+// The app's one address. Anything else that reaches this Worker - the old
+// stratusradio.ololiohill.io, or a leftover *.workers.dev link - is sent here
+// for good, keeping the path and the query so a shared station link like
+// /yumi-fm still opens its station. Addresses used while developing locally are
+// left alone, or `wrangler dev` would redirect itself off the machine.
+const CANONICAL_HOST = 'stratusradio.app';
+const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]', '::1']);
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    if (url.hostname !== CANONICAL_HOST && !LOCAL_HOSTS.has(url.hostname)) {
+      url.protocol = 'https:';
+      url.hostname = CANONICAL_HOST;
+      url.port = '';
+      return Response.redirect(url.toString(), 301);
+    }
     if (url.pathname === '/api/now') return nowPlaying(request, url, env, ctx);
     return env.ASSETS.fetch(request);
   }
@@ -57,7 +74,7 @@ async function readStreamTitle(stream) {
   let reader = null;
   try {
     const res = await fetch(stream, {
-      headers: { 'Icy-MetaData': '1', 'User-Agent': 'StratusRadio/1.0 (+https://stratusradio.ololiohill.io)' },
+      headers: { 'Icy-MetaData': '1', 'User-Agent': 'StratusRadio/1.0 (+https://stratusradio.app)' },
       signal: ctrl.signal
     });
     const metaint = parseInt(res.headers.get('icy-metaint') || '', 10);

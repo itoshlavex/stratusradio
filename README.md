@@ -8,7 +8,7 @@ Live radio from across the Pacific, by [Ololio Hill Technologies](https://ololio
 - Choose a country, filter by Music, News & talk or Christian, or search by station, town, country or language.
 - Favourites, saved on each phone.
 - Share the app: the paper-plane button at the top shares the link to Stratus Radio itself.
-- Share a station: the paper-plane button beside each station sends a short link, like `https://stratusradio.ololiohill.io/yumi-fm`, that opens Stratus Radio with that station ready to play. The part after the `/` is the station's `id` in `stations.js`.
+- Share a station: the paper-plane button beside each station sends a short link, like `https://stratusradio.app/yumi-fm`, that opens Stratus Radio with that station ready to play. The part after the `/` is the station's `id` in `stations.js`.
 - Light mode by default; tap the button in the header to switch to dark (the choice is remembered).
 - Keeps playing with the screen locked. Play, pause and change station from the lock screen or headphones.
 - Sleep timer: 15 minutes to 2 hours, or a custom time in hours and minutes, with a short fade-out.
@@ -17,9 +17,11 @@ Live radio from across the Pacific, by [Ololio Hill Technologies](https://ololio
 
 ## Where it lives
 
-The app is hosted free on Cloudflare at **https://stratusradio.ololiohill.io**.
+The app is hosted free on Cloudflare at **https://stratusradio.app**. That is its only address, and the one to push and deploy to.
 
-Cloudflare is linked to this GitHub repository. Every change to the `main` branch goes live on its own, usually within a minute. To update the app, change the files on `main`, either by editing them on github.com or with **Add file → Upload files** (keep files at the top level, not inside a folder; a file with the same name replaces the old one). Changes on any other branch get their own preview link instead, so you can check them first.
+The old address, `stratusradio.ololiohill.io`, is kept attached to the Worker for one reason: `worker.js` answers it with a permanent redirect to `stratusradio.app`, keeping whatever path was asked for, so an old shared link like `.../yumi-fm` still opens its station. Nothing is served on it. There is no `*.workers.dev` address and no per-branch preview links.
+
+Cloudflare is linked to this GitHub repository. Every change to the `main` branch goes live on its own, usually within a minute. To update the app, change the files on `main`, either by editing them on github.com or with **Add file → Upload files** (keep files at the top level, not inside a folder; a file with the same name replaces the old one). Because preview links are off, a change pushed to any other branch is not published anywhere — check it locally with `npx wrangler dev`, then put it on `main`.
 
 On a phone, open the link and use **Add to Home Screen** (iPhone: Share → Add to Home Screen; Android: the Install button in the app or the browser menu).
 
@@ -27,15 +29,15 @@ On a phone, open the link and use **Add to Home Screen** (iPhone: Share → Add 
 
 Kept here in case it ever needs doing again.
 
-1. Sign in at [dash.cloudflare.com](https://dash.cloudflare.com) with the account that has the `ololiohill.io` domain.
+1. Sign in at [dash.cloudflare.com](https://dash.cloudflare.com) with the account that has the `stratusradio.app` domain (and `ololiohill.io`, which still redirects).
 2. Open **Workers & Pages**, tap **Create application**, and choose the **GitHub** option (it may say **Import a repository**).
 3. When asked, sign in to GitHub and allow Cloudflare to see the `stratusradio` repository.
 4. Pick the `stratusradio` repository. Keep the project name as `stratusradio`: it must match `name` in `wrangler.jsonc` or the deploy fails. Leave the build command empty and keep the deploy command `npx wrangler deploy`, the branch `main` and the root directory `/`.
 5. Tap **Save and Deploy**.
 
-The first deploy also sets up `stratusradio.ololiohill.io`: Cloudflare adds the DNS record and the HTTPS certificate itself. The address can take a few minutes to start working. Deploy logs are under the Worker's **Deployments** tab.
+A deploy sets up both addresses in `routes`: Cloudflare adds the DNS record and the HTTPS certificate for each itself. A new address can take a few minutes to start working. Deploy logs are under the Worker's **Deployments** tab.
 
-If the deploy says the custom domain couldn't be added, check that `ololiohill.io` is in the same Cloudflare account and that there's no existing DNS record for `stratusradio`. You can also add the domain by hand in the Worker's **Settings → Domains & Routes**.
+If the deploy says a custom domain couldn't be added, check that the domain is in the same Cloudflare account and that there's no existing DNS record competing with it. You can also add it by hand in the Worker's **Settings → Domains & Routes**.
 
 ## Adding or fixing a station
 
@@ -45,11 +47,11 @@ The stream addresses came from each station's own website or player where possib
 
 ## The Android app
 
-`download/stratusradio.apk`, served at https://stratusradio.ololiohill.io/download/stratusradio.apk. Package `io.ololiohill.stratusradio`, Android 7.0 and newer. Android phones see a small "App" button beside the company name at the bottom of the page; iPhones and computers don't, since they can't install it, and neither does the app itself.
+`download/stratusradio.apk`, served at https://stratusradio.app/download/stratusradio.apk. Package `io.ololiohill.stratusradio`, Android 7.0 and newer. Android phones see a small "App" button beside the company name at the bottom of the page; iPhones and computers don't, since they can't install it, and neither does the app itself.
 
 It is built the same way as RollCall's app:
 
-- **It is a shell around the live site, not a copy of it.** A Capacitor app whose window loads https://stratusradio.ololiohill.io (`capacitor.config.json`). Changes to the stations or the player reach installed phones straight away: rebuild the APK only for a new icon, name or version.
+- **It is a shell around the live site, not a copy of it.** A Capacitor app whose window loads https://stratusradio.app (`capacitor.config.json`). Changes to the stations or the player reach installed phones straight away: rebuild the APK only for a new icon, name or version.
 - **The first launch needs a connection.** After that the service worker keeps the app itself, as it does in a browser. With no connection at all, the app shows `android-shell/index.html` instead of an error page. That folder is the only thing built into the APK.
 - **The app's window adds `StratusRadioApp` to its user agent**, which is how the site knows not to show the "App" button inside the app.
 - **The "now playing" notification** (also on the lock screen) shows the station, the song and the logo, with previous, play/pause and next. The radio still plays in the page: app.js sends what's on to `NowPlayingPlugin.java` and gets the button taps back, and `PlaybackService.java` draws the notification and runs as a media foreground service while the radio plays, so Android doesn't close the app in the background.
@@ -76,6 +78,6 @@ It is built the same way as RollCall's app:
 | `_headers` | Tells Cloudflare phones may keep the station logos for a long time |
 | `logos/` | Station logos, one square image per station, named after the station's `id` |
 | `worker.js` | Small Cloudflare helper behind `/api/now`: reads the song name a station sends inside its stream (browsers can't), so the app can show it |
-| `wrangler.jsonc` | Cloudflare hosting settings, including the `stratusradio.ololiohill.io` address |
+| `wrangler.jsonc` | Cloudflare hosting settings, including the `stratusradio.app` address and the redirect from the old one |
 | `.assetsignore` | Files in the repo that Cloudflare keeps off the website (including `android/`) |
 | `.gitignore` | Files Git leaves out of the repo |

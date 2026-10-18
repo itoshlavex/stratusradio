@@ -2,7 +2,8 @@
 // Cloudflare reads this file every time it deploys a push from GitHub.
 // The app is plain files, so there is no build step: the files at the top
 // level of the repo are served as they are (except those in .assetsignore).
-// worker.js only runs for /api/ addresses (the "now playing" lookup).
+// worker.js sees every request: it sends the old address to stratusradio.app,
+// answers /api/now (the "now playing" lookup), and hands the rest to the files.
 {
   "name": "stratusradio",
   "compatibility_date": "2026-10-01",
@@ -10,20 +11,27 @@
   "assets": {
     "directory": ".",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*"],
+    // Every address goes through worker.js first, so the old one is redirected
+    // whatever page was asked for, not just /api/. The files themselves are
+    // still served by Cloudflare; the Worker only passes them through.
+    "run_worker_first": true,
     // Addresses that aren't a file (like /yumi-fm, a shared station link)
     // open the app, which then picks that station.
     "not_found_handling": "single-page-application"
   },
-  // Cloudflare creates the DNS record and the HTTPS certificate for this
-  // address on the first deploy (ololiohill.io must be in the same Cloudflare account).
+  // stratusradio.app is the app's address. stratusradio.ololiohill.io is kept
+  // here for one reason: it has to stay attached to the Worker for worker.js to
+  // answer it with a permanent redirect to stratusradio.app, so old links and
+  // already-installed phones keep working. Nothing is served on it. Take it out
+  // of this list and it detaches, stops redirecting, and simply fails instead.
   "routes": [
+    { "pattern": "stratusradio.app", "custom_domain": true },
     { "pattern": "stratusradio.ololiohill.io", "custom_domain": true }
   ],
-  // Also serve on the free *.workers.dev address and give each non-main
-  // branch its own preview link.
-  "workers_dev": true,
-  "preview_urls": true,
+  // No *.workers.dev address, and no per-branch preview links on it either:
+  // stratusradio.app is the only address the app answers on.
+  "workers_dev": false,
+  "preview_urls": false,
   // Keep request logs in the Cloudflare dashboard (Worker → Observability).
   "observability": {
     "enabled": true

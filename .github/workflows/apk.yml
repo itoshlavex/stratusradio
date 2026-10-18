@@ -1,7 +1,7 @@
 name: APK
 
 # Builds and signs the Android app, then puts it where the site serves it
-# (https://stratusradio.ololiohill.io/download/stratusradio.apk).
+# (https://stratusradio.app/download/stratusradio.apk).
 #
 # Run from the Actions tab. Nothing here happens on a push: the APK is a shell
 # around the deployed site, so a change to the stations or the player reaches
@@ -122,5 +122,5 @@ jobs:
             echo
             echo "versionCode $APK_VERSION_CODE, committed to \`main\`. Cloudflare deploys it from there."
             echo
-            echo "It will be at https://stratusradio.ololiohill.io/download/stratusradio.apk in a minute or two."
+            echo "It will be at https://stratusradio.app/download/stratusradio.apk in a minute or two."
           } >> "$GITHUB_STEP_SUMMARY"
