@@ -26,7 +26,7 @@
   --live: #18B9FD;
   --chip-on-bg: #021A4F;
   --chip-on-fg: #FFFFFF;
-  --star-on: #0B7BF7;
+  --fav-on: #0B7BF7;
   --scrim: rgba(2, 10, 30, 0.55);
 
   --tile-navy-bg: #021A4F;   --tile-navy-fg: #18B9FD;
@@ -81,7 +81,7 @@
   --live: #3CCBFF;
   --chip-on-bg: #EAF2FF;
   --chip-on-fg: #021A4F;
-  --star-on: #3CCBFF;
+  --fav-on: #3CCBFF;
   --scrim: rgba(0, 4, 14, 0.7);
   --tile-navy-bg: #12306F;   --tile-navy-fg: #3CCBFF;
   --tile-ice-bg: #17366E;    --tile-ice-fg: #A9DEFF;
@@ -335,7 +335,7 @@ button { font: inherit; color: inherit; }
 .fav svg { width: 22px; height: 22px; }
 .share svg { width: 20px; height: 20px; }
 .st .share { margin-right: -6px; }
-.fav[aria-pressed="true"] { color: var(--star-on); }
+.fav[aria-pressed="true"] { color: var(--fav-on); }
 .fav[aria-pressed="true"] path { fill: currentColor; }
 
 .empty { padding: 32px 0; text-align: center; }

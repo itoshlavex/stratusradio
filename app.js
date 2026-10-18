@@ -143,7 +143,9 @@
     img.remove();
   }, true);
   var SHARE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5 10 14M20.5 3.5 14 20.5l-4-6.5-6.5-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>';
-  var STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
+  // Outlined until the station is a favourite, then filled - .fav[aria-pressed]
+  // in app.css paints the path, so the icon needs no second copy for the on state.
+  var HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>';
 
   function rowHTML(st) {
     var fav = favs.has(st.id);
@@ -162,7 +164,7 @@
       '</button>' +
       '<button class="share" type="button" aria-label="Share ' + esc(st.name) + '">' + SHARE + '</button>' +
       '<button class="fav" type="button" aria-pressed="' + fav + '" aria-label="' +
-        (fav ? 'Remove ' : 'Add ') + esc(st.name) + (fav ? ' from' : ' to') + ' favourites">' + STAR + '</button>' +
+        (fav ? 'Remove ' : 'Add ') + esc(st.name) + (fav ? ' from' : ' to') + ' favourites">' + HEART + '</button>' +
     '</li>';
   }
 
@@ -237,7 +239,7 @@
     if (!n) {
       if (filter === 'fav' && !favs.size) {
         el.emptyTitle.textContent = 'No favourites yet';
-        el.emptyBody.textContent = 'Tap the star next to a station to keep it here.';
+        el.emptyBody.textContent = 'Tap the heart next to a station to keep it here.';
       } else {
         el.emptyTitle.textContent = 'No stations match';
         el.emptyBody.textContent = query ? 'Try another word, or clear the search.' : 'Try another type of station or another country.';
