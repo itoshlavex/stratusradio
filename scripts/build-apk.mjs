@@ -69,7 +69,7 @@ if (!existsSync(KEYSTORE_PROPERTIES)) {
   process.exit(1);
 }
 
-// The native project holds its own copy of capacitor.config.ts and of the
+// The native project holds its own copy of capacitor.config.json and of the
 // placeholder webDir, so a change to either only reaches the APK through this.
 run("npx", ["cap", "sync", "android"], { JAVA_HOME, ANDROID_HOME });
 run(GRADLEW, ["-p", "android", "assembleRelease"], { JAVA_HOME, ANDROID_HOME });

@@ -4,7 +4,7 @@ Live radio from across the Pacific, by [Ololio Hill Technologies](https://ololio
 
 ## Features
 
-- Stations from Papua New Guinea and across the Pacific, plus New Zealand and Australia (Pacific, Torres Strait and First Nations stations, public radio and the main networks), RNZ Pacific and ABC Radio Australia. Every stream in the list has been checked to play.
+- 110 stations from Papua New Guinea and across the Pacific, plus New Zealand and Australia (Pacific, Torres Strait and First Nations stations, public radio and the main networks), RNZ Pacific and ABC Radio Australia. Every stream in the list has been checked to play.
 - Choose a country, filter by Music, News & talk or Christian, or search by station, town, country or language.
 - Favourites, saved on each phone.
 - Share the app: the paper-plane button at the top shares the link to Stratus Radio itself.
@@ -35,13 +35,15 @@ Kept here in case it ever needs doing again.
 4. Pick the `stratusradio` repository. Keep the project name as `stratusradio`: it must match `name` in `wrangler.jsonc` or the deploy fails. Leave the build command empty and keep the deploy command `npx wrangler deploy`, the branch `main` and the root directory `/`.
 5. Tap **Save and Deploy**.
 
-A deploy sets up both addresses in `routes`: Cloudflare adds the DNS record and the HTTPS certificate for each itself. A new address can take a few minutes to start working. Deploy logs are under the Worker's **Deployments** tab.
+A deploy sets up all three addresses in `routes` (`stratusradio.app`, `www.stratusradio.app` and `stratusradio.ololiohill.io`): Cloudflare adds the DNS record and the HTTPS certificate for each itself. A new address can take a few minutes to start working. Deploy logs are under the Worker's **Deployments** tab.
 
 If the deploy says a custom domain couldn't be added, check that the domain is in the same Cloudflare account and that there's no existing DNS record competing with it. You can also add it by hand in the Worker's **Settings → Domains & Routes**.
 
 ## Adding or fixing a station
 
-Stations are listed in `stations.js`. Copy a block, give it a new `id`, and paste the station's direct stream address in `stream`. For its logo, add a square image named after the `id` to the `logos` folder, for example `logos/yumi-fm.webp` (256 × 256 pixels in WebP format works well). Without a logo, the tile shows the station's frequency instead. Phones keep logos for a long time, so if you replace an existing logo, also raise `LOGO_VERSION` near the top of the logo code in `app.js` (for example from 1 to 2) so everyone gets the new one. That's the address that plays audio, not the station's web page. You can list several addresses, and the app tries them in order.
+Stations are listed in `stations.js`; the comment at the top of that file explains each field. Copy a block, give it a new `id`, and paste the station's direct stream address in `stream`. That's the address that plays audio, not the station's web page. You can list several addresses, and the app tries them in order.
+
+For its logo, add a square image named after the `id` to the `logos` folder, for example `logos/yumi-fm.webp` (256 × 256 pixels in WebP format works well). Without a logo, the tile shows the station's frequency (or its `short` letters) instead. Phones keep logos for a long time, so if you replace an existing logo, also raise `LOGO_VERSION` near the top of the logo code in `app.js` (for example from 1 to 2) so everyone gets the new one.
 
 The stream addresses came from each station's own website or player where possible. The address must start with `https://`, because the app is served over HTTPS and phones block plain `http://` streams on it. Stations change their stream addresses from time to time, so if one stops working, check its website for a new player.
 
@@ -56,9 +58,14 @@ It is built the same way as RollCall's app:
 - **The app's window adds `StratusRadioApp` to its user agent**, which is how the site knows not to show the "App" button inside the app.
 - **The "now playing" notification** (also on the lock screen) shows the station, the song and the logo, with previous, play/pause and next. The radio still plays in the page: app.js sends what's on to `NowPlayingPlugin.java` and gets the button taps back, and `PlaybackService.java` draws the notification and runs as a media foreground service while the radio plays, so Android doesn't close the app in the background.
 - **Release it from the Actions tab:** run the **APK** workflow and type a version, like `1.0.1`. It restores the signing key from secrets, counts `versionCode` up, builds with `npm run apk`, checks the certificate, and commits the APK and `android/app/build.gradle` to `main`; Cloudflare publishes it from there. `npm run apk` also builds on a machine that has the key, a JDK and the Android SDK.
-- **The signing key** belongs in two Actions secrets, `ANDROID_KEYSTORE_BASE64` and `ANDROID_KEYSTORE_PASSWORD`, and in the owner's own backup. It is never in the repo. **Until those two secrets are added, the APK workflow cannot run** - it stops at its own guard before building, so a release has to be built by hand on a machine with the key. Android installs an update only if it is signed with the same key, so if the key is lost, everyone has to uninstall the app before they can get a newer one.
+- **The signing key** is kept in two Actions secrets, `ANDROID_KEYSTORE_BASE64` and `ANDROID_KEYSTORE_PASSWORD`, and in the owner's own backup. It is never in the repo. Both secrets are in place (the workflow built 1.0.1 and 1.0.2). If either is ever removed, the workflow stops at its own guard before building, and a release has to be built by hand on a machine with the key. Android installs an update only if it is signed with the same key, so if the key is lost, everyone has to uninstall the app before they can get a newer one.
 - **The certificate** (SHA-256) is `e758709f2c454d5a5d5aac8d110101cf41930b082c93a57d73a8b548c27bf3e9`, `CN=Stratus Radio, O=Ololio Hill Technologies`. The key was reissued on 18 October 2026, before anyone had the app installed; the certificate before it was `edb04910cbdf3fcd4a89d0ecd48669bb8e06efd9c26fa81811e1095589453ec6` and no longer signs anything.
-- Shipped: 1.0 / versionCode 1 (18 October 2026, the first build on stratusradio.app and on the reissued key). The numbering starts again here: the builds before it (1.0, 1.0.1, 1.0.2 and 1.0.3, all 17 October 2026) carried the old address or the old key, nobody had them installed, and none of them can be updated to this one. The name 1.0 is deliberately used again - `versionName` is only a label, `versionCode` is what Android compares, and the build that first carried the name is gone.
+- Shipped, all on 18 October 2026 and all signed with the reissued key:
+  - 1.0 / versionCode 1: the first build on stratusradio.app.
+  - 1.0.1 / versionCode 2: built by the APK workflow.
+  - 1.0.2 / versionCode 3: built by the APK workflow. This is the current one.
+
+  The numbering starts again here: the builds before it (1.0, 1.0.1, 1.0.2 and 1.0.3, all 17 October 2026) carried the old address or the old key, nobody had them installed, and none of them can be updated to this one. The names 1.0, 1.0.1 and 1.0.2 are deliberately used again - `versionName` is only a label, `versionCode` is what Android compares, and the builds that first carried those names are gone.
 
 ## Files
 
@@ -75,9 +82,12 @@ It is built the same way as RollCall's app:
 | `android/`, `capacitor.config.json`, `android-shell/` | The Android app (see above) |
 | `package.json`, `scripts/build-apk.mjs` | Builds the Android app (`npm run apk`); the site itself needs no build |
 | `download/stratusradio.apk` | The built Android app |
-| `_headers` | Tells Cloudflare phones may keep the station logos for a long time |
+| `_headers` | Tells Cloudflare phones may keep the station logos for a long time, and never to cache the APK |
+| `wrangler.jsonc` | Cloudflare settings: the Worker, the three addresses, no preview links |
+| `.assetsignore` | Files in the repo that Cloudflare does not put on the website |
+| `.github/workflows/apk.yml` | The **APK** workflow that builds, signs and commits the Android app |
 | `logos/` | Station logos, one square image per station, named after the station's `id` |
-| `worker.js` | Small Cloudflare helper behind `/api/now`: reads the song name a station sends inside its stream (browsers can't), so the app can show it |
+| `worker.js` | Small Cloudflare helper: redirects the other addresses to stratusradio.app, and answers `/api/now` by reading the song name a station sends inside its stream (browsers can't), so the app can show it |
 | `wrangler.jsonc` | Cloudflare hosting settings, including the `stratusradio.app` address and the two that redirect to it |
 | `.assetsignore` | Files in the repo that Cloudflare keeps off the website (including `android/`) |
 | `.gitignore` | Files Git leaves out of the repo |

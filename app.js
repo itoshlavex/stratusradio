@@ -56,14 +56,11 @@
     return Object.assign({ cats: [], tile: 'navy', stream: [] }, s);
   });
 
-  function allStations() { return stations; }
   function byId(id) {
     for (var i = 0; i < stations.length; i++) if (stations[i].id === id) return stations[i];
     return null;
   }
 
-  // Older versions also listed stations from an online directory; forget those.
-  try { localStorage.removeItem(KEY + 'dir'); localStorage.removeItem(KEY + 'dir2'); } catch (e) {}
   var favs = new Set(store.get('favs', []).filter(byId));
   var filter = store.get('filter', 'all');
   if (!CATS.some(function (c) { return c.id === filter; })) filter = 'all';
@@ -114,15 +111,15 @@
 
   /* ---------- Rendering ---------- */
 
-  // Station logos live in logos/<id>.webp (set logo: false in stations.js to skip one).
+  // Station logos live in logos/<id>.webp.
   // If a logo fails to load, the tile falls back to its frequency or letters.
   // Phones keep logos for a long time; after replacing a logo file, raise LOGO_VERSION so
   // everyone gets the new one.
   var LOGO_VERSION = 1;
   var noLogo = new Set();
   function logoOf(st) {
-    if (st.logo === false || noLogo.has(st.id)) return '';
-    return (st.logo || 'logos/' + st.id + '.webp') + '?v=' + LOGO_VERSION;
+    if (noLogo.has(st.id)) return '';
+    return 'logos/' + st.id + '.webp?v=' + LOGO_VERSION;
   }
   function tileClass(st, extra) {
     return 'tile ' + (extra ? extra + ' ' : '') + 't-' + st.tile + (logoOf(st) ? ' has-logo' : '');
@@ -181,13 +178,13 @@
     if (filter !== 'all' && filter !== 'fav' && (st.cats || []).indexOf(filter) < 0) return false;
     if (!query) return true;
     var c = COUNTRY[st.country] || {};
-    var hay = [st.name, st.freq, st.city, st.also, st.lang, st.desc, st.tags, st.short, c.label, c.place].join(' ').toLowerCase();
+    var hay = [st.name, st.freq, st.city, st.also, st.lang, st.desc, st.short, c.label, c.place].join(' ').toLowerCase();
     return query.split(/\s+/).every(function (w) { return hay.indexOf(w) >= 0; });
   }
 
   function renderCountries() {
     var counts = {};
-    allStations().forEach(function (st) { counts[st.country] = (counts[st.country] || 0) + 1; });
+    stations.forEach(function (st) { counts[st.country] = (counts[st.country] || 0) + 1; });
     var codes = Object.keys(counts).filter(function (k) { return COUNTRY[k]; })
       .sort(function (a, b) { return COUNTRY[a].order - COUNTRY[b].order; });
     if (country !== 'all' && !counts[country]) country = 'all';
@@ -225,7 +222,7 @@
   // never redrawn. (Rows are in the same order as the stations list.)
   var rowsBuilt = false;
   function renderList() {
-    if (!rowsBuilt) { el.list.innerHTML = allStations().map(rowHTML).join(''); rowsBuilt = true; }
+    if (!rowsBuilt) { el.list.innerHTML = stations.map(rowHTML).join(''); rowsBuilt = true; }
     var rows = el.list.children, n = 0;
     for (var i = 0; i < rows.length; i++) {
       var show = matches(stations[i]);
@@ -808,10 +805,10 @@
   function step(dir) {
     var pool;
     if (current && favs.has(current.id) && favs.size > 1) {
-      pool = allStations().filter(function (s) { return favs.has(s.id); });
+      pool = stations.filter(function (s) { return favs.has(s.id); });
     } else {
-      pool = allStations().filter(matches);
-      if (!pool.length) pool = allStations();
+      pool = stations.filter(matches);
+      if (!pool.length) pool = stations;
     }
     if (!pool.length) return;
     var i = -1;
@@ -1195,15 +1192,10 @@
 
   // Opened from a shared link: pick that station and show it, ready to play.
   function openSharedStation() {
-    // /yumi-fm, or ?station=yumi-fm from links shared before the short form.
-    var id = null;
-    try { id = new URLSearchParams(location.search).get('station'); } catch (e) {}
-    if (!id) {
-      var path = location.pathname.replace(/^\/+|\/+$/g, '');
-      try { path = decodeURIComponent(path); } catch (e) {}
-      if (path && path !== 'index.html') id = path;
-    }
-    if (!id) return null;
+    // /yumi-fm
+    var id = location.pathname.replace(/^\/+|\/+$/g, '');
+    try { id = decodeURIComponent(id); } catch (e) {}
+    if (!id || id === 'index.html') return null;
     try { history.replaceState(null, '', '/'); } catch (e) {}
     var st = byId(id);
     if (!st) return null;
@@ -1266,7 +1258,4 @@
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
     window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
   }
-
-  // Exposed for testing in the browser console.
-  window.stratus = { stations: allStations, play: function (id) { playStation(byId(id)); }, state: function () { return state; } };
 })();

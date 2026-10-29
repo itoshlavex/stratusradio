@@ -17,7 +17,8 @@
     stream   list of stream URLs, tried in order until one plays
     resolve  optional: look the stream up live (AzuraCast "now playing" API)
     np       optional: where the station publishes the song on air (ABC stations)
-    match    words used to spot the same station in the online directory
+    match    words in the station's name or slogan: a "now playing" title that
+             contains one is the station naming itself, not a song, so it is hidden
     homepage station website
 
   To add a station: copy a block, give it a new id and paste its direct

@@ -1,8 +1,9 @@
 /* Stratus Radio on Cloudflare.
    The app itself is plain files. This Worker stands in front of every address
-   (wrangler.jsonc, run_worker_first) for two reasons: it sends the old
-   stratusradio.ololiohill.io address to stratusradio.app, and it hands every
-   other request straight to Cloudflare's own file store, which serves it.
+   (wrangler.jsonc, run_worker_first) for two reasons: it sends
+   www.stratusradio.app and the old stratusradio.ololiohill.io address to
+   stratusradio.app, and it hands every other request straight to Cloudflare's
+   own file store, which serves it.
    Its real work is /api/now?u=<stream address>: it opens the station's
    stream for a moment, reads the song or programme name the station sends inside
    it (Icecast/Shoutcast "ICY" metadata, which browsers can't read), and returns it
@@ -14,8 +15,8 @@ const CACHE_SECONDS = 20;
 const LIST_SECONDS = 600; // re-read stations.js this often
 const TIMEOUT_MS = 8000;
 
-// The app's one address. Anything else that reaches this Worker - the old
-// stratusradio.ololiohill.io, or a leftover *.workers.dev link - is sent here
+// The app's one address. Anything else that reaches this Worker - the www.
+// address or the old stratusradio.ololiohill.io - is sent here
 // for good, keeping the path and the query so a shared station link like
 // /yumi-fm still opens its station. Addresses used while developing locally are
 // left alone, or `wrangler dev` would redirect itself off the machine.
